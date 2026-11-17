@@ -1,0 +1,3398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Petualangan Lift Angka Nol: Si Kucing Hitam — Matematika Kelas III SD</title>
+  <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS & SKALA ADAPTIF SMART TV (ANTI-TERPOTONG / ZERO-CLIPPING)
+       ========================================================================== */
+    :root {
+      --bg-cream: #FFFDF5;
+      --bg-card: #FFFFFF;
+      --sky-blue: #0284C7;
+      --sky-blue-dark: #0369A1;
+      --sky-blue-deep: #0C4A6E;
+      --sky-blue-light: #E0F2FE;
+      --coin-gold: #F59E0B;
+      --coin-gold-light: #FEF3C7;
+      --coin-gold-dark: #B45309;
+      --text-navy: #0F172A;
+      --text-muted: #334155;
+      --coral-red: #DC2626;
+      --coral-red-dark: #991B1B;
+      --coral-red-light: #FEE2E2;
+      --emerald-green: #16A34A;
+      --emerald-green-dark: #166534;
+      --emerald-green-light: #DCFCE7;
+
+      /* Warna 4 Lantai Satuan */
+      --floor-kg: #E0E7FF;
+      --floor-kg-border: #4F46E5;
+      --floor-hg: #E0F2FE;
+      --floor-hg-border: #0284C7;
+      --floor-dag: #DCFCE7;
+      --floor-dag-border: #16A34A;
+      --floor-g: #FEF3C7;
+      --floor-g-border: #D97706;
+
+      /* Tipografi Ramah Anak 100% Offline */
+      --font-main: 'Nunito', 'Quicksand', 'Segoe UI', 'Comic Sans MS', 'Trebuchet MS', system-ui, -apple-system, sans-serif;
+
+      /* Skala Fluida berdasar tinggi & lebar layar (vh + vw) agar selalu muat di Smart TV 540p/720p/1080p */
+      --fs-title: clamp(16px, min(2.1vw, 3.1vh), 30px);
+      --fs-subtitle: clamp(14px, min(1.5vw, 2.4vh), 22px);
+      --fs-body: clamp(12.5px, min(1.2vw, 2.05vh), 18.5px);
+      --fs-small: clamp(11px, min(1.02vw, 1.75vh), 15.5px);
+      --fs-digit: clamp(24px, min(3vw, 4.8vh), 48px);
+
+      --radius-lg: clamp(12px, 1.4vh, 18px);
+      --radius-md: clamp(9px, 1.1vh, 13px);
+      --shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.07);
+      --shadow-card: 0 4px 12px rgba(2, 132, 199, 0.12);
+
+      /* Variabel Padding Overscan TV */
+      --tv-safe-pad-x: 0px;
+      --tv-safe-pad-y: 0px;
+    }
+
+    /* Mode Aman Bezel / Overscan Smart TV */
+    body.tv-fit-compact {
+      --tv-safe-pad-x: 1.8vw;
+      --tv-safe-pad-y: 1.6vh;
+    }
+
+    body.tv-fit-ultra {
+      --tv-safe-pad-x: 3.5vw;
+      --tv-safe-pad-y: 3vh;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: #0F172A; /* Bingkai luar gelap saat mode Overscan aktif */
+      color: var(--text-navy);
+      font-family: var(--font-main);
+      line-height: 1.3;
+    }
+
+    /* ==========================================================================
+       2. ARSITEKTUR GRID UTAMA (HEADER AUTO | STAGE 1FR | FOOTER AUTO)
+          Menjamin footer dan tombol bawah tidak pernah terdorong keluar layar!
+       ========================================================================== */
+    .app-shell {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      width: calc(100vw - (var(--tv-safe-pad-x) * 2));
+      height: calc(100vh - (var(--tv-safe-pad-y) * 2));
+      height: calc(100dvh - (var(--tv-safe-pad-y) * 2));
+      margin: var(--tv-safe-pad-y) var(--tv-safe-pad-x);
+      background-color: var(--bg-cream);
+      border-radius: calc(var(--tv-safe-pad-x) * 0.6);
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s ease;
+    }
+
+    /* HEADER RINGKAS & JELAS */
+    .app-header {
+      background: linear-gradient(135deg, var(--sky-blue-deep) 0%, var(--sky-blue) 60%, #0EA5E9 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(5px, 0.9vh, 10px) clamp(12px, 1.6vw, 24px);
+      box-shadow: 0 3px 10px rgba(2, 132, 199, 0.22);
+      z-index: 20;
+      gap: 10px;
+      border-bottom: 2.5px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 0.9vw, 14px);
+      min-width: 0;
+    }
+
+    .header-avatar {
+      width: clamp(36px, 5.2vh, 52px);
+      height: clamp(36px, 5.2vh, 52px);
+      background: #FFFFFF;
+      border-radius: 50%;
+      border: 2.5px solid var(--coin-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .header-titles {
+      min-width: 0;
+    }
+
+    .header-titles h1 {
+      font-size: clamp(15px, min(1.55vw, 2.5vh), 24px);
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-titles p {
+      font-size: clamp(11px, min(0.95vw, 1.6vh), 15px);
+      font-weight: 700;
+      color: #E0F2FE;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: clamp(6px, 0.7vw, 10px);
+      flex-shrink: 0;
+    }
+
+    .sync-pill {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1.5px solid rgba(255, 255, 255, 0.55);
+      color: #FFFFFF;
+      font-size: clamp(11px, min(0.9vw, 1.55vh), 14.5px);
+      font-weight: 800;
+      padding: clamp(4px, 0.6vh, 7px) clamp(10px, 0.9vw, 14px);
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .chapter-badge {
+      background: var(--coin-gold);
+      color: var(--text-navy);
+      font-weight: 900;
+      font-size: clamp(12px, min(1.05vw, 1.8vh), 17px);
+      padding: clamp(4px, 0.6vh, 7px) clamp(10px, 1vw, 16px);
+      border-radius: 999px;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+      white-space: nowrap;
+    }
+
+    .btn-header-tool {
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--text-navy);
+      border: 2px solid var(--coin-gold);
+      border-radius: var(--radius-md);
+      height: clamp(34px, 4.8vh, 44px);
+      padding: 0 clamp(8px, 0.8vw, 13px);
+      font-family: var(--font-main);
+      font-size: clamp(12px, min(0.98vw, 1.7vh), 16px);
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-header-tool:hover {
+      background: var(--coin-gold-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-header-tool.muted {
+      background: #E2E8F0;
+      border-color: #94A3B8;
+      color: #475569;
+    }
+
+    /* MAIN CONTENT STAGE (FLEKSIBEL 1FR DENGAN MIN-HEIGHT: 0) */
+    .app-stage {
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+      padding: clamp(6px, 1.2vh, 14px) clamp(12px, 1.6vw, 24px);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-view {
+      display: none;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      animation: fadeSlideIn 0.24s ease-out;
+    }
+
+    .page-view.active {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(6px, 1vh, 12px);
+    }
+
+    /* Khusus Halaman 1 tidak memakai baris page-heading */
+    #page-1.page-view.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* FOOTER NAVIGATION PERSISTEN & ANTI-TENGGELAM */
+    .app-footer {
+      background: #FFFFFF;
+      border-top: 2.5px solid #CBD5E1;
+      padding: clamp(5px, 0.85vh, 10px) clamp(12px, 1.6vw, 24px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 20;
+      box-shadow: 0 -3px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    .nav-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: clamp(4px, 0.45vw, 8px);
+      flex: 1;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    /* ==========================================================================
+       3. TOMBOL & KOMPONEN INTERAKTIF RAMAH LAYAR SENTUH / REMOTE TV
+       ========================================================================== */
+    .btn {
+      font-family: var(--font-main);
+      font-weight: 900;
+      font-size: clamp(12.5px, min(1.08vw, 1.9vh), 18px);
+      height: clamp(36px, 5.2vh, 46px);
+      padding: 0 clamp(10px, 1.1vw, 18px);
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      box-shadow: 0 3px 0 rgba(15, 23, 42, 0.14);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: var(--sky-blue);
+      color: #FFFFFF;
+      border-color: var(--sky-blue-dark);
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--sky-blue-dark); }
+
+    .btn-gold {
+      background: var(--coin-gold);
+      color: var(--text-navy);
+      border-color: var(--coin-gold-dark);
+    }
+    .btn-gold:hover:not(:disabled) { background: #FBBF24; }
+
+    .btn-down {
+      background: var(--coral-red);
+      color: #FFFFFF;
+      border-color: var(--coral-red-dark);
+    }
+    .btn-down:hover:not(:disabled) { background: #B91C1C; }
+
+    .btn-up {
+      background: var(--emerald-green);
+      color: #FFFFFF;
+      border-color: var(--emerald-green-dark);
+    }
+    .btn-up:hover:not(:disabled) { background: #15803D; }
+
+    .btn-outline {
+      background: #FFFFFF;
+      color: var(--text-navy);
+      border-color: #94A3B8;
+    }
+    .btn-outline:hover:not(:disabled) {
+      border-color: var(--sky-blue);
+      background: var(--sky-blue-light);
+    }
+
+    .tab-btn {
+      background: #F8FAFC;
+      color: var(--text-muted);
+      border: 2px solid #CBD5E1;
+      border-radius: 10px;
+      height: clamp(34px, 4.8vh, 44px);
+      padding: 0 clamp(8px, 0.9vw, 14px);
+      font-family: var(--font-main);
+      font-size: clamp(11.5px, min(0.98vw, 1.75vh), 16.5px);
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--sky-blue);
+      color: var(--sky-blue-dark);
+      background: #F0F9FF;
+    }
+
+    .tab-btn.active {
+      background: var(--coin-gold);
+      color: var(--text-navy);
+      border-color: var(--coin-gold-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(245, 158, 11, 0.35);
+      font-weight: 900;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 2.5px solid #CBD5E1;
+      box-shadow: var(--shadow-soft);
+      padding: clamp(8px, 1.2vh, 16px) clamp(10px, 1.2vw, 18px);
+      min-height: 0;
+      min-width: 0;
+    }
+
+    .page-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .page-heading h2 {
+      font-size: var(--fs-title);
+      font-weight: 900;
+      color: var(--sky-blue-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lkpd-tag {
+      background: var(--coin-gold-light);
+      border: 2px solid var(--coin-gold);
+      color: var(--text-navy);
+      font-size: clamp(11.5px, min(0.98vw, 1.7vh), 16px);
+      font-weight: 800;
+      padding: clamp(3px, 0.5vh, 6px) clamp(10px, 1vw, 14px);
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       4. HALAMAN 1: PEMBUKA PETUALANGAN (PROPORSIONAL & TOMBOL MULAI TERKUNCI)
+       ========================================================================== */
+    .p1-grid {
+      display: grid;
+      grid-template-columns: 40% 58.5%;
+      gap: 1.5%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .p1-visual {
+      background: linear-gradient(180deg, #E0F2FE 0%, #FEF3C7 100%);
+      border: 3px solid var(--sky-blue);
+      border-radius: var(--radius-lg);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      align-items: center;
+      justify-items: center;
+      padding: clamp(8px, 1.2vh, 14px) clamp(10px, 1.1vw, 16px);
+      gap: clamp(6px, 0.9vh, 10px);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .p1-story-col {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(6px, 1vh, 12px);
+      height: 100%;
+      min-height: 0;
+    }
+
+    .story-box {
+      background: #FFFFFF;
+      border: 2.5px solid var(--sky-blue);
+      border-radius: var(--radius-lg);
+      padding: clamp(8px, 1.1vh, 14px) clamp(12px, 1.3vw, 18px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .story-box h2 {
+      font-size: clamp(16px, min(1.7vw, 2.7vh), 28px);
+      font-weight: 900;
+      color: var(--sky-blue-dark);
+      margin-bottom: 3px;
+    }
+
+    .story-box p {
+      font-size: var(--fs-body);
+      color: var(--text-navy);
+      font-weight: 600;
+    }
+
+    .p1-dual-cards {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 1vw;
+      min-height: 0;
+    }
+
+    .goal-card {
+      background: #F0F9FF;
+      border: 2px solid #7DD3FC;
+      border-radius: var(--radius-md);
+      padding: clamp(8px, 1vh, 12px) clamp(10px, 1vw, 14px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 0;
+    }
+
+    .goal-card h3, .trigger-card h3 {
+      font-size: clamp(13.5px, min(1.2vw, 2.1vh), 20px);
+      font-weight: 900;
+      color: var(--sky-blue-dark);
+      margin-bottom: 4px;
+    }
+
+    .goal-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      flex: 1;
+      gap: 3px;
+      font-size: var(--fs-small);
+      font-weight: 700;
+    }
+
+    .goal-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .trigger-card {
+      background: var(--coin-gold-light);
+      border: 2px solid var(--coin-gold);
+      border-radius: var(--radius-md);
+      padding: clamp(8px, 1vh, 12px) clamp(10px, 1vw, 14px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .trigger-card p {
+      font-size: var(--fs-small);
+      font-weight: 700;
+      color: var(--text-navy);
+    }
+
+    .prep-strip {
+      background: var(--emerald-green-light);
+      border: 2px solid var(--emerald-green);
+      border-radius: 10px;
+      padding: clamp(5px, 0.7vh, 8px) clamp(8px, 0.8vw, 12px);
+      font-size: clamp(11px, min(0.95vw, 1.65vh), 15px);
+      font-weight: 800;
+      color: #14532D;
+    }
+
+    .cta-start {
+      width: 100%;
+      height: clamp(42px, 6.4vh, 56px);
+      font-size: clamp(16px, min(1.5vw, 2.5vh), 24px);
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      box-shadow: 0 4px 0 var(--coin-gold-dark);
+    }
+
+    /* ==========================================================================
+       5. HALAMAN 2: KENALI EMPAT SATUAN BERAT
+       ========================================================================== */
+    .p2-layout {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(6px, 1.1vh, 12px);
+      min-height: 0;
+      height: 100%;
+    }
+
+    .p2-units-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1vw;
+    }
+
+    .unit-card-btn {
+      border-radius: var(--radius-md);
+      border: 2.5px solid transparent;
+      padding: clamp(6px, 0.9vh, 12px) clamp(8px, 1vw, 14px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.16s ease;
+      font-family: var(--font-main);
+      box-shadow: var(--shadow-soft);
+      text-align: left;
+    }
+
+    .unit-card-btn[data-unit="kg"] { background: var(--floor-kg); border-color: #818CF8; }
+    .unit-card-btn[data-unit="hg"] { background: var(--floor-hg); border-color: #38BDF8; }
+    .unit-card-btn[data-unit="dag"] { background: var(--floor-dag); border-color: #4ADE80; }
+    .unit-card-btn[data-unit="g"] { background: var(--floor-g); border-color: #FBBF24; }
+
+    .unit-card-btn.active {
+      transform: translateY(-2px);
+      border-width: 3px;
+      border-color: var(--text-navy);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+    }
+
+    .unit-card-btn .u-sym {
+      font-size: clamp(18px, min(1.8vw, 3vh), 30px);
+      font-weight: 900;
+      color: var(--text-navy);
+      line-height: 1.1;
+    }
+
+    .unit-card-btn .u-name {
+      font-size: clamp(11.5px, min(1vw, 1.7vh), 16px);
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
+    .unit-card-btn .u-badge {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1.5px solid var(--text-navy);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: clamp(10.5px, min(0.85vw, 1.45vh), 13.5px);
+      font-weight: 900;
+      color: var(--text-navy);
+    }
+
+    .p2-bottom-grid {
+      display: grid;
+      grid-template-columns: 63% 35.5%;
+      gap: 1.5%;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .unit-detail-panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(6px, 1vh, 12px);
+      border-width: 3px;
+      min-height: 0;
+    }
+
+    .unit-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #E2E8F0;
+      padding-bottom: 5px;
+      gap: 8px;
+    }
+
+    .unit-detail-header h3 {
+      font-size: clamp(16px, min(1.55vw, 2.5vh), 26px);
+      font-weight: 900;
+      color: var(--sky-blue-dark);
+    }
+
+    .eq-pill {
+      background: var(--sky-blue-light);
+      color: var(--sky-blue-dark);
+      font-weight: 900;
+      font-size: clamp(12.5px, min(1.1vw, 1.85vh), 18px);
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 2px solid var(--sky-blue);
+      white-space: nowrap;
+    }
+
+    .objects-showcase {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8vw;
+      min-height: 0;
+      align-items: stretch;
+    }
+
+    .obj-item {
+      background: #F8FAFC;
+      border: 2px solid #CBD5E1;
+      border-radius: var(--radius-md);
+      padding: clamp(4px, 0.7vh, 10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 4px;
+      min-height: 0;
+    }
+
+    .obj-item svg {
+      max-height: clamp(36px, 7.5vh, 62px);
+      width: auto;
+    }
+
+    .obj-item span {
+      font-size: clamp(12px, min(1.05vw, 1.8vh), 17px);
+      font-weight: 800;
+      color: var(--text-navy);
+    }
+
+    .unit-meta-boxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8vw;
+    }
+
+    .meta-box {
+      background: #FFFBEB;
+      border: 2px solid #FDE68A;
+      border-radius: 10px;
+      padding: clamp(5px, 0.75vh, 10px) clamp(8px, 0.85vw, 12px);
+      font-size: var(--fs-small);
+      font-weight: 700;
+    }
+
+    .hg-ons-panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+      align-items: center;
+      justify-items: center;
+      text-align: center;
+      gap: clamp(4px, 0.7vh, 8px);
+      background: linear-gradient(180deg, #FFFFFF 0%, #FEF3C7 100%);
+      border: 3px solid var(--coin-gold);
+      transition: all 0.28s ease;
+      min-height: 0;
+    }
+
+    .hg-ons-panel.highlighted {
+      background: linear-gradient(180deg, #FEF3C7 0%, #FDE68A 100%);
+      border-color: var(--coral-red);
+      box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.35);
+    }
+
+    .hg-ons-equation {
+      background: #FFFFFF;
+      border: 2.5px dashed var(--sky-blue);
+      border-radius: var(--radius-md);
+      padding: clamp(5px, 0.8vh, 10px);
+      width: 100%;
+      font-size: clamp(16px, min(1.5vw, 2.5vh), 26px);
+      font-weight: 900;
+      color: var(--sky-blue-dark);
+    }
+
+    .hg-ons-panel.highlighted .hg-ons-equation {
+      border-style: solid;
+      border-color: var(--coral-red);
+      color: var(--coral-red);
+      background: #FFFDF5;
+    }
+
+    /* ==========================================================================
+       6. HALAMAN 3: PETUALANGAN TANGGA SATUAN
+       ========================================================================== */
+    .p3-grid {
+      display: grid;
+      grid-template-columns: 52% 46.5%;
+      gap: 1.5%;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .ladder-arena {
+      background: linear-gradient(180deg, #F0F9FF 0%, #FFFDF5 100%);
+      border: 3px solid var(--sky-blue);
+      border-radius: var(--radius-lg);
+      padding: clamp(8px, 1.2vh, 16px) clamp(12px, 1.3vw, 20px);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    .ladder-steps {
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      gap: clamp(6px, 1.1vh, 12px);
+      height: 88%;
+      position: relative;
+    }
+
+    .step-row {
+      display: flex;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      min-height: 0;
+    }
+
+    .step-block {
+      height: 100%;
+      border-radius: 12px;
+      border: 3px solid var(--text-navy);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(10px, 1.1vw, 16px);
+      font-weight: 900;
+      box-shadow: 0 3px 0 rgba(15, 23, 42, 0.14);
+      transition: all 0.22s ease;
+    }
+
+    .step-row[data-step="0"] .step-block { width: 42%; margin-left: 0%; background: var(--floor-kg); border-color: var(--floor-kg-border); }
+    .step-row[data-step="1"] .step-block { width: 44%; margin-left: 16%; background: var(--floor-hg); border-color: var(--floor-hg-border); }
+    .step-row[data-step="2"] .step-block { width: 44%; margin-left: 34%; background: var(--floor-dag); border-color: var(--floor-dag-border); }
+    .step-row[data-step="3"] .step-block { width: 46%; margin-left: 52%; background: var(--floor-g); border-color: var(--floor-g-border); }
+
+    .step-row.active .step-block {
+      transform: scale(1.03);
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.6);
+    }
+
+    .step-row.seq-glow .step-block {
+      background: var(--coin-gold) !important;
+      color: var(--text-navy);
+      transform: scale(1.05);
+    }
+
+    .step-unit-label {
+      font-size: clamp(16px, min(1.55vw, 2.6vh), 28px);
+    }
+
+    .step-mnemonic-word {
+      font-size: clamp(11.5px, min(1vw, 1.7vh), 17px);
+      background: rgba(255, 255, 255, 0.88);
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+
+    .ladder-cat-sprite {
+      position: absolute;
+      width: clamp(44px, 7vh, 72px);
+      height: clamp(44px, 7vh, 72px);
+      transition: top 0.48s cubic-bezier(0.34, 1.4, 0.64, 1), left 0.48s cubic-bezier(0.34, 1.4, 0.64, 1);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .arrow-badge-down {
+      position: absolute;
+      left: 3%;
+      bottom: 4%;
+      background: var(--coral-red-light);
+      border: 2px solid var(--coral-red);
+      color: var(--coral-red);
+      padding: 5px 12px;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: clamp(11.5px, min(1.02vw, 1.75vh), 17px);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .arrow-badge-up {
+      position: absolute;
+      right: 3%;
+      top: 4%;
+      background: var(--emerald-green-light);
+      border: 2px solid var(--emerald-green);
+      color: var(--emerald-green);
+      padding: 5px 12px;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: clamp(11.5px, min(1.02vw, 1.75vh), 17px);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .pulse-arrow {
+      transform: scale(1.1);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.7);
+    }
+
+    .p3-controls-col {
+      display: grid;
+      grid-template-rows: auto auto auto minmax(0, 1fr);
+      gap: clamp(6px, 1vh, 10px);
+      min-height: 0;
+      height: 100%;
+    }
+
+    .mnemonic-banner {
+      background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+      border: 2.5px solid var(--coin-gold);
+      border-radius: var(--radius-md);
+      padding: clamp(6px, 0.9vh, 12px) clamp(10px, 1vw, 14px);
+      text-align: center;
+    }
+
+    .mnemonic-banner .m-title {
+      font-size: clamp(11px, min(0.95vw, 1.6vh), 15px);
+      font-weight: 900;
+      color: var(--coin-gold-dark);
+      text-transform: uppercase;
+    }
+
+    .mnemonic-banner .m-phrase {
+      font-size: clamp(17px, min(1.65vw, 2.8vh), 28px);
+      font-weight: 900;
+      color: var(--text-navy);
+      margin: 1px 0;
+    }
+
+    .mnemonic-map {
+      display: flex;
+      justify-content: space-around;
+      font-size: clamp(11px, min(0.95vw, 1.6vh), 15.5px);
+      font-weight: 800;
+      color: var(--sky-blue-dark);
+    }
+
+    .ladder-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6vw;
+    }
+
+    .rules-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6vw;
+    }
+
+    .rule-box {
+      border-radius: 10px;
+      padding: clamp(6px, 0.8vh, 10px) clamp(8px, 0.9vw, 12px);
+      font-size: var(--fs-small);
+      font-weight: 800;
+    }
+
+    .rule-box.down {
+      background: var(--coral-red-light);
+      border: 2px solid var(--coral-red);
+      color: #7F1D1D;
+    }
+
+    .rule-box.up {
+      background: var(--emerald-green-light);
+      border: 2px solid var(--emerald-green);
+      color: #14532D;
+    }
+
+    .ladder-feedback-box {
+      background: #F0F9FF;
+      border: 2.5px solid var(--sky-blue);
+      border-radius: 12px;
+      padding: clamp(6px, 0.9vh, 12px) clamp(10px, 1vw, 14px);
+      font-size: var(--fs-body);
+      font-weight: 800;
+      color: var(--text-navy);
+      display: flex;
+      align-items: center;
+    }
+
+    /* ==========================================================================
+       7. HALAMAN 4: SIMULASI LIFT ANGKA NOL (FITUR INTI — TATA LETAK PRESISI)
+       ========================================================================== */
+    .p4-grid {
+      display: grid;
+      grid-template-columns: 34% 64.5%;
+      gap: 1.5%;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .tower-panel {
+      background: linear-gradient(180deg, #0284C7 0%, #38BDF8 100%);
+      border: 3px solid var(--text-navy);
+      border-radius: var(--radius-lg);
+      padding: clamp(6px, 1vh, 12px) clamp(8px, 0.9vw, 14px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(6px, 0.8vh, 10px);
+      min-height: 0;
+    }
+
+    .tower-roof {
+      background: var(--coin-gold);
+      border: 2px solid var(--text-navy);
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 900;
+      font-size: clamp(12px, min(1.05vw, 1.8vh), 17px);
+      padding: 3px 8px;
+      color: var(--text-navy);
+    }
+
+    .tower-body {
+      display: grid;
+      grid-template-columns: 54% 44%;
+      gap: 2%;
+      position: relative;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .floors-stack {
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      gap: clamp(4px, 0.7vh, 8px);
+      height: 100%;
+      min-height: 0;
+    }
+
+    .tower-floor {
+      border-radius: 10px;
+      border: 2.5px solid var(--text-navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 10px;
+      font-weight: 900;
+      transition: all 0.25s ease;
+      min-height: 0;
+    }
+
+    .tower-floor[data-floor="0"] { background: var(--floor-kg); }
+    .tower-floor[data-floor="1"] { background: var(--floor-hg); }
+    .tower-floor[data-floor="2"] { background: var(--floor-dag); }
+    .tower-floor[data-floor="3"] { background: var(--floor-g); }
+
+    .tower-floor.current-floor {
+      box-shadow: 0 0 0 3.5px var(--coin-gold);
+      transform: scale(1.02);
+    }
+
+    .tower-floor .f-num {
+      font-size: clamp(10px, min(0.8vw, 1.35vh), 13.5px);
+      color: var(--text-muted);
+    }
+
+    .tower-floor .f-unit {
+      font-size: clamp(15px, min(1.35vw, 2.3vh), 23px);
+      color: var(--text-navy);
+    }
+
+    .elevator-shaft {
+      background: #1E293B;
+      border: 2.5px solid var(--coin-gold);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .shaft-cable {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: repeating-linear-gradient(to bottom, #94A3B8 0 6px, #475569 6px 12px);
+      transform: translateX(-50%);
+    }
+
+    .elevator-cabin {
+      position: absolute;
+      left: 6%;
+      width: 88%;
+      height: 23%;
+      background: linear-gradient(180deg, #FDE68A 0%, #F59E0B 100%);
+      border: 2.5px solid #FFFFFF;
+      border-radius: 10px;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: top 0.9s cubic-bezier(0.34, 1.22, 0.64, 1);
+      z-index: 5;
+      padding: 2px;
+    }
+
+    .cabin-readout {
+      background: var(--text-navy);
+      color: #FDE047;
+      font-size: clamp(11px, min(0.95vw, 1.65vh), 16px);
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 5px;
+      margin-top: -2px;
+      white-space: nowrap;
+    }
+
+    /* Kolom Kanan Simulasi: 5 Baris Terukur Pasti Muat */
+    .sim-right-col {
+      display: grid;
+      grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+      gap: clamp(5px, 0.85vh, 9px);
+      min-height: 0;
+      height: 100%;
+    }
+
+    .sim-setup-bar {
+      background: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      border-radius: var(--radius-md);
+      padding: clamp(4px, 0.65vh, 8px) clamp(8px, 0.9vw, 14px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .selector-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .selector-label {
+      font-size: clamp(12px, min(1vw, 1.7vh), 16.5px);
+      font-weight: 800;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .chip-btn {
+      min-width: clamp(34px, 3vw, 44px);
+      height: clamp(30px, 4.3vh, 38px);
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 2px solid #CBD5E1;
+      background: #F8FAFC;
+      font-family: var(--font-main);
+      font-size: clamp(13px, min(1.1vw, 1.85vh), 18px);
+      font-weight: 900;
+      color: var(--text-navy);
+      cursor: pointer;
+      transition: all 0.14s ease;
+    }
+
+    .chip-btn.active {
+      background: var(--sky-blue);
+      color: #FFFFFF;
+      border-color: var(--sky-blue-dark);
+    }
+
+    .presets-bar {
+      background: #FFFBEB;
+      border: 2px solid #FDE68A;
+      border-radius: var(--radius-md);
+      padding: clamp(4px, 0.6vh, 7px) clamp(8px, 0.9vw, 14px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      background: #FFFFFF;
+      border: 2px solid var(--coin-gold);
+      color: var(--text-navy);
+      font-family: var(--font-main);
+      font-size: clamp(11.5px, min(0.95vw, 1.65vh), 15.5px);
+      font-weight: 900;
+      padding: 0 clamp(8px, 0.8vw, 12px);
+      height: clamp(28px, 4vh, 36px);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .preset-btn:hover {
+      background: var(--coin-gold);
+    }
+
+    .sim-action-row {
+      display: grid;
+      grid-template-columns: 1.35fr 1.35fr 0.7fr;
+      gap: 0.7vw;
+    }
+
+    .sim-display-card {
+      background: #FFFFFF;
+      border: 2.5px solid var(--sky-blue);
+      border-radius: var(--radius-lg);
+      padding: clamp(6px, 1vh, 12px) clamp(10px, 1.1vw, 16px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(4px, 0.7vh, 8px);
+      box-shadow: var(--shadow-card);
+      min-height: 0;
+    }
+
+    .sim-top-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px dashed #CBD5E1;
+      padding-bottom: 4px;
+      font-size: clamp(12.5px, min(1.08vw, 1.85vh), 18px);
+      font-weight: 800;
+    }
+
+    .sim-math-row {
+      display: grid;
+      grid-template-columns: 46% 52%;
+      gap: 2%;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .formula-box {
+      background: #F0F9FF;
+      border: 2px solid var(--sky-blue);
+      border-radius: var(--radius-md);
+      padding: clamp(4px, 0.7vh, 10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .formula-box .f-caption {
+      font-size: clamp(11px, min(0.92vw, 1.55vh), 15px);
+      font-weight: 800;
+      color: var(--sky-blue-dark);
+    }
+
+    .formula-box .f-eq {
+      font-size: clamp(17px, min(1.65vw, 2.8vh), 28px);
+      font-weight: 900;
+      color: var(--text-navy);
+    }
+
+    .result-box {
+      background: #FFFBEB;
+      border: 2.5px solid var(--coin-gold);
+      border-radius: var(--radius-md);
+      padding: clamp(4px, 0.7vh, 10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .result-box .r-caption {
+      font-size: clamp(11px, min(0.92vw, 1.55vh), 15px);
+      font-weight: 800;
+      color: var(--coin-gold-dark);
+    }
+
+    .result-box .r-val {
+      font-size: var(--fs-digit);
+      font-weight: 900;
+      color: var(--text-navy);
+      line-height: 1.05;
+    }
+
+    .coin-rack {
+      background: #F8FAFC;
+      border: 2px solid #CBD5E1;
+      border-radius: 10px;
+      padding: clamp(4px, 0.6vh, 8px) clamp(8px, 0.9vw, 12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: clamp(36px, 5.2vh, 46px);
+    }
+
+    .coin-rack-label {
+      font-size: clamp(12px, min(1vw, 1.7vh), 16.5px);
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
+    .coins-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .base-digit-pill {
+      background: var(--sky-blue);
+      color: #FFFFFF;
+      font-size: clamp(15px, min(1.35vw, 2.3vh), 23px);
+      font-weight: 900;
+      padding: 2px 12px;
+      border-radius: 8px;
+    }
+
+    .zero-coin {
+      width: clamp(28px, 4.2vh, 40px);
+      height: clamp(28px, 4.2vh, 40px);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #FDE68A, #F59E0B 70%, #B45309 100%);
+      border: 2.5px solid #78350F;
+      color: var(--text-navy);
+      font-size: clamp(15px, min(1.3vw, 2.2vh), 22px);
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(180, 83, 9, 0.35);
+      animation: coinPopIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes coinPopIn {
+      0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    .anti-misconception-banner {
+      background: var(--coral-red-light);
+      border: 2px solid var(--coral-red);
+      border-radius: 10px;
+      padding: clamp(4px, 0.65vh, 8px) clamp(8px, 0.9vw, 12px);
+      font-size: clamp(11.5px, min(0.96vw, 1.65vh), 15.5px);
+      font-weight: 800;
+      color: #7F1D1D;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ==========================================================================
+       8. HALAMAN 5: LATIHAN INTERAKTIF (TOMBOL BAWAH SELALU TERLIHAT)
+       ========================================================================== */
+    .p5-layout {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(6px, 1vh, 10px);
+      min-height: 0;
+      height: 100%;
+    }
+
+    .exercise-tabs-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .ex-tab-list {
+      display: flex;
+      gap: 6px;
+    }
+
+    .ex-tab {
+      background: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      border-radius: 10px;
+      padding: 0 clamp(10px, 1vw, 16px);
+      height: clamp(34px, 4.8vh, 42px);
+      font-family: var(--font-main);
+      font-size: clamp(12.5px, min(1.05vw, 1.8vh), 17.5px);
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ex-tab.active {
+      background: var(--sky-blue);
+      color: #FFFFFF;
+      border-color: var(--sky-blue-dark);
+    }
+
+    .ex-tab.solved {
+      border-color: var(--emerald-green);
+      background: var(--emerald-green-light);
+      color: #14532D;
+    }
+
+    .ex-tab.active.solved {
+      background: var(--emerald-green);
+      color: #FFFFFF;
+    }
+
+    .stars-tracker {
+      background: var(--coin-gold-light);
+      border: 2px solid var(--coin-gold);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: clamp(13px, min(1.1vw, 1.85vh), 18px);
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .p5-workspace {
+      display: grid;
+      grid-template-columns: 57% 41.5%;
+      gap: 1.5%;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .question-card {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(6px, 1vh, 12px);
+      border: 3px solid var(--sky-blue);
+      min-height: 0;
+    }
+
+    .q-badge {
+      display: inline-block;
+      background: var(--sky-blue-light);
+      color: var(--sky-blue-dark);
+      font-weight: 900;
+      font-size: clamp(11.5px, min(0.98vw, 1.65vh), 16px);
+      padding: 3px 12px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+    }
+
+    .q-prompt {
+      font-size: clamp(16px, min(1.5vw, 2.55vh), 26px);
+      font-weight: 900;
+      color: var(--text-navy);
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: clamp(6px, 1vh, 10px);
+      min-height: 0;
+    }
+
+    .options-grid.horizontal {
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .option-btn {
+      flex: 1;
+      min-height: clamp(38px, 5.8vh, 52px);
+      max-height: 68px;
+      background: #F8FAFC;
+      border: 2.5px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 6px 16px;
+      font-family: var(--font-main);
+      font-size: clamp(15px, min(1.35vw, 2.3vh), 23px);
+      font-weight: 900;
+      color: var(--text-navy);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--sky-blue);
+      background: var(--sky-blue-light);
+      transform: translateY(-1px);
+    }
+
+    .option-btn.correct {
+      background: var(--emerald-green);
+      border-color: #14532D;
+      color: #FFFFFF;
+    }
+
+    .option-btn.wrong {
+      background: var(--coin-gold-light);
+      border-color: var(--coin-gold-dark);
+      color: #78350F;
+    }
+
+    .ex-bottom-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 4px;
+      border-top: 2px dashed #E2E8F0;
+    }
+
+    .feedback-side {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: clamp(6px, 1vh, 10px);
+      justify-items: center;
+      align-items: center;
+      text-align: center;
+      background: #F8FAFC;
+      border: 3px solid #CBD5E1;
+      min-height: 0;
+    }
+
+    .feedback-status {
+      width: 100%;
+      padding: clamp(6px, 0.9vh, 10px);
+      border-radius: 10px;
+      font-size: clamp(13.5px, min(1.15vw, 1.95vh), 19.5px);
+      font-weight: 900;
+    }
+
+    .feedback-status.neutral {
+      background: #E0F2FE;
+      color: var(--sky-blue-dark);
+    }
+
+    .feedback-status.success {
+      background: var(--emerald-green-light);
+      border: 2px solid var(--emerald-green);
+      color: #14532D;
+    }
+
+    .feedback-status.retry {
+      background: var(--coin-gold-light);
+      border: 2px solid var(--coin-gold);
+      color: #78350F;
+    }
+
+    .explanation-box {
+      width: 100%;
+      height: 100%;
+      background: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      border-radius: 12px;
+      padding: clamp(8px, 1vh, 12px);
+      text-align: left;
+      font-size: var(--fs-body);
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .explanation-box.unlocked {
+      border-color: var(--emerald-green);
+      background: #F0FDF4;
+    }
+
+    /* ==========================================================================
+       9. HALAMAN 6: TANTANGAN AKHIR (SLOT TETAP ANTI-TERDORONG)
+       ========================================================================== */
+    .p6-container {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(6px, 1vh, 12px);
+      min-height: 0;
+      height: 100%;
+    }
+
+    .p6-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FFFFFF;
+      border: 2px solid var(--coin-gold);
+      border-radius: 12px;
+      padding: clamp(5px, 0.8vh, 9px) clamp(12px, 1.2vw, 18px);
+    }
+
+    .challenge-card {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FFFBEB 100%);
+      border: 3px solid var(--coin-gold);
+      border-radius: var(--radius-lg);
+      padding: clamp(10px, 1.4vh, 18px) clamp(14px, 1.6vw, 24px);
+      display: grid;
+      grid-template-columns: 64% 34%;
+      gap: 2%;
+      align-items: stretch;
+      box-shadow: var(--shadow-soft);
+      min-height: 0;
+    }
+
+    .challenge-left-col {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(6px, 1vh, 12px);
+      min-height: 0;
+    }
+
+    .challenge-prompt {
+      font-size: clamp(17px, min(1.65vw, 2.8vh), 29px);
+      font-weight: 900;
+      color: var(--text-navy);
+      margin-top: 2px;
+    }
+
+    /* Slot Tetap agar saat dibuka tidak mendorong tombol ke bawah */
+    .challenge-reveal-slot {
+      border-radius: 14px;
+      padding: clamp(8px, 1.1vh, 14px) clamp(12px, 1.2vw, 16px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
+      transition: all 0.25s ease;
+    }
+
+    .challenge-reveal-slot.locked {
+      background: #F8FAFC;
+      border: 2.5px dashed #94A3B8;
+      color: var(--text-muted);
+    }
+
+    .challenge-reveal-slot.unlocked {
+      background: var(--emerald-green-light);
+      border: 2.5px solid var(--emerald-green);
+      color: var(--text-navy);
+    }
+
+    .challenge-reveal-slot .ans-text {
+      font-size: clamp(16px, min(1.45vw, 2.4vh), 25px);
+      font-weight: 900;
+      color: #14532D;
+      margin-bottom: 3px;
+    }
+
+    .challenge-reveal-slot .exp-text {
+      font-size: var(--fs-body);
+      font-weight: 700;
+      color: var(--text-navy);
+    }
+
+    .challenge-controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* ==========================================================================
+       10. CELEBRATION MODAL OVERLAY
+       ========================================================================== */
+    .celebration-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 2vw;
+    }
+
+    .celebration-overlay.active {
+      display: flex;
+      animation: fadeSlideIn 0.3s ease;
+    }
+
+    .celebration-card {
+      background: linear-gradient(180deg, #FFFDF5 0%, #FEF3C7 100%);
+      border: 4px solid var(--coin-gold);
+      border-radius: 24px;
+      max-width: 880px;
+      width: 90vw;
+      max-height: 92vh;
+      padding: clamp(14px, 2.2vh, 26px) clamp(18px, 2.2vw, 32px);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: clamp(6px, 1vh, 12px);
+    }
+
+    .award-badge {
+      display: inline-block;
+      background: var(--coin-gold);
+      color: var(--text-navy);
+      border: 3px solid #FFFFFF;
+      border-radius: 999px;
+      padding: 6px 22px;
+      font-size: clamp(15px, min(1.35vw, 2.3vh), 23px);
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45);
+    }
+
+    .celebration-msg {
+      font-size: var(--fs-body);
+      font-weight: 700;
+      color: var(--text-navy);
+      max-width: 780px;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 11px;
+      height: 11px;
+      border-radius: 3px;
+      animation: confettiFall 2.6s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(500px) rotate(540deg); opacity: 0; }
+    }
+
+    @keyframes catFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .cat-animate {
+      animation: catFloat 2.4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- ======================================================================
+         HEADER PERSISTEN DENGAN KONTROL KHUSUS SMART TV (OVERSCAN FIT & FULLSCREEN)
+         ====================================================================== -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="header-avatar" id="headerCatAvatar" aria-hidden="true"></div>
+        <div class="header-titles">
+          <h1>Petualangan Lift Angka Nol: Si Kucing Hitam</h1>
+          <p>Matematika Kelas III SD (Fase B) • Satuan Berat Baku (kg, hg/ons, dag, g)</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="sync-pill" id="headerSyncPill" title="Pola Pause & Sync Meja Siswa">
+          <span>⏸️ Pause &amp; Sync: Buku Log &amp; Kartu Saku</span>
+        </div>
+        <div class="chapter-badge" id="headerChapterBadge">Bab 1 / 6</div>
+
+        <!-- Tombol Penyesuai Bezel / Overscan Smart TV -->
+        <button type="button" class="btn-header-tool" id="btnTvFit" title="Sesuaikan batas layar jika tepi Smart TV terpotong">
+          <span>📺</span>
+          <span id="tvFitLabel">TV: Penuh</span>
+        </button>
+
+        <!-- Tombol Layar Penuh (Sembunyikan Address Bar Browser TV) -->
+        <button type="button" class="btn-header-tool" id="btnFullscreen" title="Mode Layar Penuh Smart TV">
+          <span id="fullscreenIcon">⛶</span>
+          <span id="fullscreenLabel">Layar Penuh</span>
+        </button>
+
+        <!-- Tombol Suara -->
+        <button type="button" class="btn-header-tool" id="btnAudioToggle" aria-label="Tombol Suara">
+          <span id="audioIcon">🔊</span>
+          <span id="audioLabel">Suara</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ======================================================================
+         MAIN CONTENT STAGE (FLEKSIBEL 1FR — ANTI TERPOTONG)
+         ====================================================================== -->
+    <main class="app-stage">
+      <!-- ====================================================================
+           HALAMAN 1 – PEMBUKA: PETUALANGAN SI KUCING HITAM
+           ==================================================================== -->
+      <section class="page-view active" id="page-1">
+        <div class="p1-grid">
+          <!-- Kolom Kiri: Menara Gudang Timbangan 4 Lantai & Si Kucing Hitam -->
+          <div class="p1-visual">
+            <div style="font-weight:900; font-size: var(--fs-body); color: var(--sky-blue-dark); background:#FFF; padding:4px 14px; border-radius:999px; border:2px solid var(--sky-blue);">
+              🏰 Menara Gudang Timbangan (4 Lantai)
+            </div>
+
+            <!-- SVG Ilustrasi Menara 4 Lantai + Poros Lift Emas -->
+            <svg viewBox="0 0 340 245" style="width: 100%; height: 100%; max-height: 100%; overflow: visible;" preserveAspectRatio="xMidYMid meet" aria-label="Menara Gudang Timbangan">
+              <polygon points="30,40 170,6 310,40" fill="#F59E0B" stroke="#0F172A" stroke-width="3.5" stroke-linejoin="round"/>
+              <circle cx="170" cy="23" r="10" fill="#FFFDF5" stroke="#0F172A" stroke-width="2.5"/>
+              <text x="170" y="28" text-anchor="middle" font-size="13" font-weight="900" fill="#0F172A">0</text>
+
+              <rect x="42" y="40" width="256" height="198" rx="10" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5"/>
+
+              <rect x="52" y="48" width="150" height="41" rx="8" fill="#E0E7FF" stroke="#4F46E5" stroke-width="2.5"/>
+              <text x="127" y="74" text-anchor="middle" font-size="17" font-weight="900" fill="#0F172A">Lantai 4: kg</text>
+
+              <rect x="52" y="95" width="150" height="41" rx="8" fill="#E0F2FE" stroke="#0284C7" stroke-width="2.5"/>
+              <text x="127" y="121" text-anchor="middle" font-size="17" font-weight="900" fill="#0F172A">Lantai 3: hg (ons)</text>
+
+              <rect x="52" y="142" width="150" height="41" rx="8" fill="#DCFCE7" stroke="#16A34A" stroke-width="2.5"/>
+              <text x="127" y="168" text-anchor="middle" font-size="17" font-weight="900" fill="#0F172A">Lantai 2: dag</text>
+
+              <rect x="52" y="189" width="150" height="41" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2.5"/>
+              <text x="127" y="215" text-anchor="middle" font-size="17" font-weight="900" fill="#0F172A">Lantai 1: g</text>
+
+              <rect x="212" y="48" width="76" height="182" rx="10" fill="#1E293B" stroke="#F59E0B" stroke-width="3.5"/>
+              <line x1="250" y1="48" x2="250" y2="230" stroke="#94A3B8" stroke-width="3" stroke-dasharray="6 5"/>
+
+              <rect x="220" y="60" width="60" height="44" rx="8" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2.5"/>
+              <text x="250" y="87" text-anchor="middle" font-size="14" font-weight="900" fill="#0F172A">LIFT 0</text>
+            </svg>
+
+            <div style="display:flex; align-items:center; gap:10px; width:100%; background:#FFFFFF; border:2.5px solid var(--coin-gold); border-radius:14px; padding:6px 10px;">
+              <div id="p1CatMascot" class="cat-animate" style="width:clamp(46px, 6.8vh, 66px); height:clamp(46px, 6.8vh, 66px); flex-shrink:0;"></div>
+              <div style="font-size: var(--fs-small); font-weight:800; color:var(--text-navy);">
+                “Halo! Aku <strong>Si Kucing Hitam</strong>, masinis Lift Angka Nol. Ayo jadi <strong>Asisten Penimbang Cilik</strong> bersama teman sebangkumu!”
+              </div>
+            </div>
+          </div>
+
+          <!-- Kolom Kanan: Cerita, Misi, Tujuan, Pemantik & Tombol Mulai -->
+          <div class="p1-story-col">
+            <div class="story-box">
+              <h2>Petualangan Lift Angka Nol: Si Kucing Hitam</h2>
+              <p>
+                Di tengah kota berdiri <strong>Menara Gudang Timbangan</strong> empat lantai yang menyimpan berbagai paket barang. Penjaganya adalah <strong>Si Kucing Hitam</strong> bertopi masinis lift dan berkalung lonceng emas. Hari ini, banyak paket datang dengan label berat berbeda. Yuk, bantu Si Kucing Hitam merapikan paket memakai <strong>Lift Angka Nol</strong>!
+              </p>
+            </div>
+
+            <div class="p1-dual-cards">
+              <div class="goal-card">
+                <h3>🎯 Misi &amp; Tujuan Belajar Kita</h3>
+                <ul class="goal-list">
+                  <li><span>1️⃣</span><span>Mengenal 4 satuan berat (<strong>kg, hg/ons, dag, g</strong>) dan contoh bendanya.</span></li>
+                  <li><span>2️⃣</span><span>Mengurutkan satuan dari paling berat sampai paling ringan.</span></li>
+                  <li><span>3️⃣</span><span>Menghitung perubahan lift turun (<strong>×10</strong>) dan naik (<strong>÷10</strong>).</span></li>
+                  <li><span>4️⃣</span><span>Membandingkan dan mengubah satuan berat bersama teman sebangku.</span></li>
+                </ul>
+              </div>
+
+              <div class="trigger-card">
+                <div>
+                  <h3>💬 Pertanyaan Pemantik</h3>
+                  <p>
+                    “Pernahkah kalian ikut ibu berbelanja ke pasar atau warung? Saat membeli <strong>beras</strong> dan membeli <strong>cabai</strong>, apakah satuan berat yang disebut pedagang sama? Mengapa berbeda?”
+                  </p>
+                </div>
+                <div class="prep-strip">
+                  🎒 <strong>Siapkan di Meja:</strong> Alat tulis, <em>LKPD Buku Log</em> (Kotak Identitas), dan <em>Kartu Saku Tangga &amp; Koin Lift</em>!
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-gold cta-start" id="btnStartAdventure">
+              <span>🔔 Mulai Petualangan Sekarang!</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           HALAMAN 2 – KENALI EMPAT SATUAN BERAT
+           ==================================================================== -->
+      <section class="page-view" id="page-2">
+        <div class="page-heading">
+          <h2>📦 Kenali Empat Satuan Berat Baku</h2>
+          <span class="lkpd-tag">📝 LKPD Buku Log: Misi 1A &amp; Kartu Referensi Saku</span>
+        </div>
+
+        <div class="p2-layout">
+          <!-- Baris Atas: 4 Kartu Satuan yang Dapat Diklik -->
+          <div class="p2-units-row">
+            <button type="button" class="unit-card-btn active" data-unit="kg">
+              <div>
+                <div class="u-sym">kg</div>
+                <div class="u-name">Kilogram</div>
+              </div>
+              <span class="u-badge">Lantai 4</span>
+            </button>
+            <button type="button" class="unit-card-btn" data-unit="hg">
+              <div>
+                <div class="u-sym">hg (ons)</div>
+                <div class="u-name">Hektogram / Ons</div>
+              </div>
+              <span class="u-badge">Lantai 3</span>
+            </button>
+            <button type="button" class="unit-card-btn" data-unit="dag">
+              <div>
+                <div class="u-sym">dag</div>
+                <div class="u-name">Dekagram</div>
+              </div>
+              <span class="u-badge">Lantai 2</span>
+            </button>
+            <button type="button" class="unit-card-btn" data-unit="g">
+              <div>
+                <div class="u-sym">g</div>
+                <div class="u-name">Gram</div>
+              </div>
+              <span class="u-badge">Lantai 1</span>
+            </button>
+          </div>
+
+          <!-- Baris Bawah: Panel Detail Satuan & Panel Sorot Kesetaraan hg = ons -->
+          <div class="p2-bottom-grid">
+            <div class="card unit-detail-panel" id="unitDetailPanel">
+              <!-- Diisi dinamis oleh JS -->
+            </div>
+
+            <div class="card hg-ons-panel" id="hgOnsHighlightCard">
+              <div style="font-weight:900; font-size: var(--fs-subtitle); color: var(--coin-gold-dark);">
+                ⚖️ Penegasan Wajib Pasar &amp; Sekolah
+              </div>
+
+              <!-- SVG Timbangan Seimbang -->
+              <svg viewBox="0 0 260 118" style="width: 86%; height: 100%; max-height: 105px;" preserveAspectRatio="xMidYMid meet" aria-label="Timbangan Seimbang 1 hg = 1 ons = 100 g">
+                <rect x="85" y="102" width="90" height="11" rx="5.5" fill="#0F172A"/>
+                <rect x="124" y="30" width="12" height="74" rx="4" fill="#334155"/>
+                <polygon points="130,18 120,34 140,34" fill="#F59E0B" stroke="#0F172A" stroke-width="2"/>
+                <line x1="42" y1="32" x2="218" y2="32" stroke="#0284C7" stroke-width="6" stroke-linecap="round"/>
+                <!-- Piringan Kiri -->
+                <line x1="54" y1="32" x2="36" y2="64" stroke="#64748B" stroke-width="2.5"/>
+                <line x1="54" y1="32" x2="72" y2="64" stroke="#64748B" stroke-width="2.5"/>
+                <path d="M24,64 Q54,80 84,64 Z" fill="#F59E0B" stroke="#0F172A" stroke-width="2"/>
+                <rect x="33" y="43" width="42" height="21" rx="5" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
+                <text x="54" y="58" text-anchor="middle" font-size="13" font-weight="900" fill="#0F172A">1 hg</text>
+                <!-- Piringan Kanan -->
+                <line x1="206" y1="32" x2="188" y2="64" stroke="#64748B" stroke-width="2.5"/>
+                <line x1="206" y1="32" x2="224" y2="64" stroke="#64748B" stroke-width="2.5"/>
+                <path d="M176,64 Q206,80 236,64 Z" fill="#F59E0B" stroke="#0F172A" stroke-width="2"/>
+                <rect x="183" y="43" width="46" height="21" rx="5" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+                <text x="206" y="58" text-anchor="middle" font-size="13" font-weight="900" fill="#0F172A">1 ons</text>
+              </svg>
+
+              <div class="hg-ons-equation" id="hgOnsEquationBox">
+                1 hg = 1 ons = 100 g
+              </div>
+
+              <p style="font-size: var(--fs-small); font-weight:700; color:var(--text-muted);">
+                Hektogram (<strong>hg</strong>) dan <strong>ons</strong> memiliki berat yang sama persis, yaitu <strong>100 gram</strong>!
+              </p>
+
+              <button type="button" class="btn btn-gold" id="btnHighlightHgOns" style="width:100%;">
+                ✨ Sorot Kesetaraan: hg = ons
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           HALAMAN 3 – PETUALANGAN TANGGA SATUAN
+           ==================================================================== -->
+      <section class="page-view" id="page-3">
+        <div class="page-heading">
+          <h2>🪜 Petualangan Tangga Satuan Berat</h2>
+          <span class="lkpd-tag">📝 LKPD Misi 1B &amp; Susun Kartu Simbol Satuan di Meja</span>
+        </div>
+
+        <div class="p3-grid">
+          <!-- Kolom Kiri: Diagram Tangga 4 Tingkat -->
+          <div class="ladder-arena">
+            <div class="arrow-badge-down" id="badgeArrowDown">⬇️ Turun 1 Tangga (×10)</div>
+            <div class="arrow-badge-up" id="badgeArrowUp">⬆️ Naik 1 Tangga (÷10)</div>
+
+            <div class="ladder-steps" id="ladderStepsContainer">
+              <div class="step-row active" data-step="0">
+                <div class="step-block">
+                  <span class="step-unit-label">kg</span>
+                  <span class="step-mnemonic-word">🐱 Kucing</span>
+                </div>
+              </div>
+              <div class="step-row" data-step="1">
+                <div class="step-block">
+                  <span class="step-unit-label">hg (ons)</span>
+                  <span class="step-mnemonic-word">🖤 Hitam</span>
+                </div>
+              </div>
+              <div class="step-row" data-step="2">
+                <div class="step-block">
+                  <span class="step-unit-label">dag</span>
+                  <span class="step-mnemonic-word">📦 Dalam</span>
+                </div>
+              </div>
+              <div class="step-row" data-step="3">
+                <div class="step-block">
+                  <span class="step-unit-label">g</span>
+                  <span class="step-mnemonic-word">🌊 Got</span>
+                </div>
+              </div>
+
+              <!-- Karakter Si Kucing Hitam Melangkah di Tangga -->
+              <div class="ladder-cat-sprite" id="ladderCatSprite"></div>
+            </div>
+          </div>
+
+          <!-- Kolom Kanan: Jembatan Keledai & Kontrol Tangga -->
+          <div class="p3-controls-col">
+            <div class="mnemonic-banner">
+              <div class="m-title">🎵 Jembatan Keledai Wajib Hafal</div>
+              <div class="m-phrase">“Kucing Hitam Dalam Got”</div>
+              <div class="mnemonic-map">
+                <span>Kucing = <strong>kg</strong></span>
+                <span>•</span>
+                <span>Hitam = <strong>hg/ons</strong></span>
+                <span>•</span>
+                <span>Dalam = <strong>dag</strong></span>
+                <span>•</span>
+                <span>Got = <strong>g</strong></span>
+              </div>
+            </div>
+
+            <div class="ladder-btn-grid">
+              <button type="button" class="btn btn-down" id="btnLadderDown">
+                ⬇️ Turun 1 Tangga (×10)
+              </button>
+              <button type="button" class="btn btn-up" id="btnLadderUp" disabled>
+                ⬆️ Naik 1 Tangga (÷10)
+              </button>
+              <button type="button" class="btn btn-primary" id="btnSortDesc">
+                🔽 Urut Turun (kg → g)
+              </button>
+              <button type="button" class="btn btn-gold" id="btnSortAsc">
+                🔼 Urut Naik (g → kg)
+              </button>
+            </div>
+
+            <div class="rules-summary-grid">
+              <div class="rule-box down">
+                <div>⬇️ <strong>Aturan Turun Tangga:</strong></div>
+                <div>• Turun 1 tingkat = <strong>× 10</strong></div>
+                <div>• Turun 2 tingkat = <strong>× 100</strong></div>
+                <div>• Turun 3 tingkat = <strong>× 1.000</strong></div>
+              </div>
+              <div class="rule-box up">
+                <div>⬆️ <strong>Aturan Naik Tangga:</strong></div>
+                <div>• Naik 1 tingkat = <strong>÷ 10</strong></div>
+                <div>• Naik 2 tingkat = <strong>÷ 100</strong></div>
+                <div>• Naik 3 tingkat = <strong>÷ 1.000</strong></div>
+              </div>
+            </div>
+
+            <div class="ladder-feedback-box" id="ladderFeedbackBox">
+              <div>🐱 <strong>Si Kucing Hitam berada di puncak tangga (kg).</strong> Ini adalah satuan paling besar. Klik tombol atau anak tangga untuk melangkah!</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           HALAMAN 4 – SIMULASI LIFT ANGKA NOL (FITUR INTI)
+           ==================================================================== -->
+      <section class="page-view" id="page-4">
+        <div class="page-heading">
+          <h2>🛗 Simulasi Lift Angka Nol &amp; Koin Angka 0</h2>
+          <span class="lkpd-tag">⏸️ Pause &amp; Sync: Susun Kartu Angka &amp; Koin Meja → Catat di LKPD Misi 2</span>
+        </div>
+
+        <div class="p4-grid">
+          <!-- Kolom Kiri: Menara Gudang Timbangan & Kabin Lift Vertikal -->
+          <div class="tower-panel">
+            <div class="tower-roof">🏰 MENARA GUDANG TIMBANGAN</div>
+            <div class="tower-body">
+              <div class="floors-stack" id="towerFloorsStack">
+                <div class="tower-floor current-floor" data-floor="0">
+                  <span class="f-num">Lantai 4 (Puncak)</span>
+                  <span class="f-unit">kg</span>
+                </div>
+                <div class="tower-floor" data-floor="1">
+                  <span class="f-num">Lantai 3</span>
+                  <span class="f-unit">hg (ons)</span>
+                </div>
+                <div class="tower-floor" data-floor="2">
+                  <span class="f-num">Lantai 2</span>
+                  <span class="f-unit">dag</span>
+                </div>
+                <div class="tower-floor" data-floor="3">
+                  <span class="f-num">Lantai 1 (Dasar)</span>
+                  <span class="f-unit">g</span>
+                </div>
+              </div>
+
+              <div class="elevator-shaft">
+                <div class="shaft-cable"></div>
+                <div class="elevator-cabin" id="elevatorCabin" style="top: 1.5%;">
+                  <div id="cabinCatMount" style="width: clamp(32px, 5vh, 46px); height: clamp(32px, 5vh, 46px);"></div>
+                  <div class="cabin-readout" id="cabinReadout">1 kg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kolom Kanan: Kontrol Simulasi, Layar Rumus, Hasil & Koin Angka 0 -->
+          <div class="sim-right-col">
+            <!-- Baris 1: Pemilih Angka & Satuan Awal -->
+            <div class="sim-setup-bar">
+              <div class="selector-group">
+                <span class="selector-label">Angka Awal:</span>
+                <button type="button" class="chip-btn active" data-base="1">1</button>
+                <button type="button" class="chip-btn" data-base="2">2</button>
+                <button type="button" class="chip-btn" data-base="3">3</button>
+                <button type="button" class="chip-btn" data-base="5">5</button>
+              </div>
+              <div class="selector-group">
+                <span class="selector-label">Satuan Awal:</span>
+                <button type="button" class="chip-btn active" data-startunit="kg">kg</button>
+                <button type="button" class="chip-btn" data-startunit="hg">hg</button>
+                <button type="button" class="chip-btn" data-startunit="dag">dag</button>
+                <button type="button" class="chip-btn" data-startunit="g">g</button>
+              </div>
+            </div>
+
+            <!-- Baris 2: Contoh Terpandu -->
+            <div class="presets-bar">
+              <span class="selector-label" style="color:var(--coin-gold-dark);">🌟 Contoh Terpandu:</span>
+              <div style="display:flex; gap:5px; flex-wrap:nowrap;">
+                <button type="button" class="preset-btn" data-preset="1kg_g">1 kg → g</button>
+                <button type="button" class="preset-btn" data-preset="1000g_kg">1.000 g → kg</button>
+                <button type="button" class="preset-btn" data-preset="2kg_hg">2 kg → hg</button>
+                <button type="button" class="preset-btn" data-preset="5hg_dag">5 hg → dag</button>
+                <button type="button" class="preset-btn" data-preset="3dag_g">3 dag → g</button>
+              </div>
+            </div>
+
+            <!-- Baris 3: Tombol Aksi Naik / Turun / Reset -->
+            <div class="sim-action-row">
+              <button type="button" class="btn btn-down" id="btnLiftDown">
+                ⬇️ Turun 1 Lantai (×10)
+              </button>
+              <button type="button" class="btn btn-up" id="btnLiftUp" disabled>
+                ⬆️ Naik 1 Lantai (÷10)
+              </button>
+              <button type="button" class="btn btn-outline" id="btnLiftReset">
+                🔄 Reset
+              </button>
+            </div>
+
+            <!-- Baris 4: Kartu Hasil Konversi, Rumus Matematika, & Koin Angka 0 -->
+            <div class="sim-display-card">
+              <div class="sim-top-info">
+                <span>Posisi Awal: <strong id="simStartDisplay" style="color:var(--sky-blue-dark);">1 kg</strong></span>
+                <span>Lantai Sekarang: <strong id="simTargetDisplay" style="color:var(--coral-red);">kg (Lantai 4)</strong></span>
+              </div>
+
+              <div class="sim-math-row">
+                <div class="formula-box">
+                  <div class="f-caption">Operasi Matematika Sebenarnya</div>
+                  <div class="f-eq" id="simFormulaDisplay">1 × 1 = 1</div>
+                </div>
+                <div class="result-box">
+                  <div class="r-caption">Hasil Konversi</div>
+                  <div class="r-val" id="simResultDisplay">1 kg</div>
+                </div>
+              </div>
+
+              <div class="coin-rack">
+                <span class="coin-rack-label" id="coinRackCaption">Visualisasi Koin Angka 0 (0 koin):</span>
+                <div class="coins-container" id="coinsContainer">
+                  <span class="base-digit-pill">1</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Baris 5: Catatan Wajib Anti-Miskonsepsi -->
+            <div class="anti-misconception-banner">
+              <span>⚠️</span>
+              <span><strong>Catatan Penting:</strong> Koin Angka 0 hanya alat bantu visual. Aturan sebenarnya adalah mengalikan atau membagi dengan 10.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           HALAMAN 5 – LATIHAN INTERAKTIF
+           ==================================================================== -->
+      <section class="page-view" id="page-5">
+        <div class="page-heading">
+          <h2>✏️ Latihan Interaktif Lima Keterampilan</h2>
+          <span class="lkpd-tag">📝 LKPD Buku Log: Misi 3 &amp; Gunakan Kartu Saku Meja</span>
+        </div>
+
+        <div class="p5-layout">
+          <div class="exercise-tabs-bar">
+            <div class="ex-tab-list" id="exerciseTabsList">
+              <!-- Diisi dinamis oleh JS -->
+            </div>
+            <div class="stars-tracker" id="exerciseStarsTracker">
+              ⭐ Bintang Latihan: 0 / 5
+            </div>
+          </div>
+
+          <div class="p5-workspace">
+            <!-- Kartu Soal & Pilihan Jawaban -->
+            <div class="card question-card">
+              <div>
+                <span class="q-badge" id="exSkillBadge">Latihan 1 • Urutkan Terbesar ke Terkecil</span>
+                <div class="q-prompt" id="exPromptText">Urutkan: dag, kg, g, hg.</div>
+              </div>
+
+              <div class="options-grid" id="exOptionsGrid">
+                <!-- Opsi jawaban diisi dinamis -->
+              </div>
+
+              <div class="ex-bottom-actions">
+                <div style="display:flex; gap:8px;">
+                  <button type="button" class="btn btn-outline" id="btnExRetry" style="display:none;">
+                    🔄 Coba Lagi
+                  </button>
+                  <button type="button" class="btn btn-primary" id="btnExShowExp">
+                    💡 Lihat Pembahasan
+                  </button>
+                </div>
+                <button type="button" class="btn btn-gold" id="btnExNextQuestion">
+                  Soal Berikutnya ▶
+                </button>
+              </div>
+            </div>
+
+            <!-- Panel Umpan Balik, Maskot & Pembahasan (Slot Tetap) -->
+            <div class="card feedback-side">
+              <div id="exCatMount" style="width: clamp(64px, 11vh, 96px); height: clamp(64px, 11vh, 96px);"></div>
+
+              <div class="feedback-status neutral" id="exFeedbackStatus">
+                Diskusikan dengan teman sebangkumu, lalu pilih jawaban yang paling tepat!
+              </div>
+
+              <div class="explanation-box" id="exExplanationBox">
+                <div style="font-weight:900; color:var(--sky-blue-dark); margin-bottom:3px;" id="exExpHeader">
+                  📖 Kotak Pembahasan:
+                </div>
+                <div id="exExplanationText">
+                  Pilih salah satu jawaban di sebelah kiri atau klik tombol <strong>Lihat Pembahasan</strong> untuk melihat cara menghitungnya.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           HALAMAN 6 – TANTANGAN AKHIR ASISTEN PENIMBANG CILIK
+           ==================================================================== -->
+      <section class="page-view" id="page-6">
+        <div class="page-heading">
+          <h2>🏆 Tantangan Akhir Asisten Penimbang Cilik</h2>
+          <span class="lkpd-tag">📝 Tulis Jawaban di LKPD Tantangan Akhir Sebelum Kunci Dibuka!</span>
+        </div>
+
+        <div class="p6-container">
+          <!-- Bar Indikator 5 Bintang Tantangan -->
+          <div class="p6-top-bar">
+            <span style="font-size: var(--fs-subtitle); font-weight:900; color:var(--coin-gold-dark);" id="challengeCounterLabel">
+              Tantangan 1 dari 5
+            </span>
+            <div id="challengeStarsRow" style="font-size: clamp(16px, min(1.5vw, 2.5vh), 26px); letter-spacing: 3px;">
+              ☆ ☆ ☆ ☆ ☆
+            </div>
+          </div>
+
+          <!-- Kartu Soal Tantangan (Dengan Slot Tetap agar Tombol Bawah Tidak Pernah Terdorong) -->
+          <div class="challenge-card">
+            <div class="challenge-left-col">
+              <div>
+                <span class="q-badge" style="background:var(--coin-gold-light); color:var(--coin-gold-dark);" id="challengeTag">
+                  Misi Evaluasi #1
+                </span>
+                <div class="challenge-prompt" id="challengePromptText">
+                  3 kg jeruk = ... hg.
+                </div>
+              </div>
+
+              <div class="challenge-reveal-slot locked" id="challengeRevealSlot">
+                <div class="ans-text" id="challengeAnswerText">🔒 Kunci Jawaban Masih Tertutup</div>
+                <div class="exp-text" id="challengeExpText">
+                  Hitung bersama teman sebangkumu di LKPD Buku Log terlebih dahulu, kemudian klik tombol <strong>Buka Kunci &amp; Pembahasan</strong> di bawah!
+                </div>
+              </div>
+
+              <div>
+                <button type="button" class="btn btn-gold" id="btnRevealChallenge" style="width:100%;">
+                  🔓 Buka Kunci &amp; Pembahasan
+                </button>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:#FFFDF5; border:2px dashed var(--coin-gold); border-radius:16px; padding:10px; min-height:0;">
+              <div id="challengeCatMount" style="width: clamp(72px, 12vh, 108px); height: clamp(72px, 12vh, 108px);"></div>
+              <p style="font-size: var(--fs-small); font-weight:800; color:var(--text-muted); margin-top:6px;" id="challengeSideHint">
+                Ayo hitung bersama pasanganmu di <strong>Buku Log</strong>! Gunakan aturan <strong>×10</strong> dan <strong>÷10</strong>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Navigasi Soal Tantangan & Tombol Rayakan -->
+          <div class="challenge-controls-bar">
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn btn-outline" id="btnPrevChallenge" disabled>
+                ◀ Soal Sebelumnya
+              </button>
+              <button type="button" class="btn btn-primary" id="btnNextChallenge">
+                Soal Berikutnya ▶
+              </button>
+            </div>
+
+            <button type="button" class="btn btn-up" id="btnFinishCelebration">
+              🎉 Selesaikan Misi &amp; Rayakan!
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ======================================================================
+         NAVIGATION BAR BAWAH PERSISTEN (SELALU TAMPIL UTUH DI SMART TV)
+         ====================================================================== -->
+    <footer class="app-footer">
+      <div class="nav-group">
+        <button type="button" class="btn btn-outline" id="btnNavHome">🏠 Beranda</button>
+        <button type="button" class="btn btn-outline" id="btnNavPrev" disabled>◀ Sebelumnya</button>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Navigasi Bab Pembelajaran">
+        <button type="button" class="tab-btn active" data-page="1">1. Pembuka</button>
+        <button type="button" class="tab-btn" data-page="2">2. Kenali Satuan</button>
+        <button type="button" class="tab-btn" data-page="3">3. Tangga Satuan</button>
+        <button type="button" class="tab-btn" data-page="4">4. Simulasi Lift</button>
+        <button type="button" class="tab-btn" data-page="5">5. Latihan</button>
+        <button type="button" class="tab-btn" data-page="6">6. Tantangan</button>
+      </nav>
+
+      <div class="nav-group">
+        <button type="button" class="btn btn-primary" id="btnNavNext">Selanjutnya ▶</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY PERAYAAN & APRESIASI AKHIR
+       ======================================================================== -->
+  <div class="celebration-overlay" id="celebrationOverlay" role="dialog" aria-modal="true" aria-labelledby="celebTitle">
+    <div class="celebration-card" id="celebrationCard">
+      <div id="celebCatMount" style="width: clamp(80px, 14vh, 125px); height: clamp(80px, 14vh, 125px); margin: 0 auto;"></div>
+      <h2 id="celebTitle" style="font-size: var(--fs-title); font-weight: 900; color: var(--sky-blue-dark);">
+        🌟 Selamat! Misi Menara Gudang Timbangan Selesai! 🌟
+      </h2>
+      <div class="award-badge">🏅 Lencana: ASISTEN PENIMBANG CILIK</div>
+      <p class="celebration-msg">
+        “Luar biasa! Kalian semua berhasil menjadi Asisten Penimbang Cilik yang hebat. Si Kucing Hitam sangat bangga karena kalian tidak hanya hafal tangga <strong>Kucing Hitam Dalam Got</strong>, tetapi juga paham rahasia <strong>perkalian 10</strong> dan <strong>pembagian 10</strong> di setiap lantai lift. Sampai jumpa di petualangan Matematika berikutnya!”
+      </p>
+      <div style="background:#DCFCE7; border:2px solid #16A34A; border-radius:10px; padding:6px 14px; display:inline-block; font-weight:800; font-size: var(--fs-small); color:#14532D;">
+        ⭐ Jangan lupa warnai Pojok Refleksi Bintang di LKPD Buku Log kalian dan rapikan Kartu Saku ke dalam amplop!
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary" id="btnCloseCelebration">
+          Kembali ke Halaman Tantangan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       JAVASCRIPT: LOGIKA APLIKASI, SVG INLINE, MESIN MATEMATIKA & FITUR SMART TV
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------------------
+         1. STRUKTUR DATA MATERI, BENDA KONKRET, LATIHAN & TANTANGAN (SESUAI PRD)
+         ---------------------------------------------------------------------- */
+      const UNIT_INDEX = { kg: 0, hg: 1, dag: 2, g: 3 };
+      const UNITS_LIST = ['kg', 'hg', 'dag', 'g'];
+      const UNIT_LABELS = {
+        kg: 'kg',
+        hg: 'hg (ons)',
+        dag: 'dag',
+        g: 'g'
+      };
+      const FLOOR_TITLES = {
+        kg: 'kg (Lantai 4)',
+        hg: 'hg / ons (Lantai 3)',
+        dag: 'dag (Lantai 2)',
+        g: 'g (Lantai 1)'
+      };
+
+      const UNIT_DETAILS_DATA = {
+        kg: {
+          symbol: 'kg',
+          fullName: 'Kilogram (kg)',
+          equivalence: '1 kg = 10 hg = 1.000 g',
+          description: 'Satuan berat paling besar di lantai paling atas menara, digunakan untuk benda yang terasa cukup berat saat dijinjing.',
+          comparison: '1 kg jauh lebih berat daripada 1 hg atau 1 g (sama dengan gabungan 10 hg atau 1.000 g).',
+          trigger: 'Jika tangan kananmu memegang 1 kg gula pasir dan tangan kirimu memegang 1 apel, mana yang terasa jauh lebih berat?',
+          borderColor: '#4F46E5',
+          objects: [
+            { name: 'Kantong Beras', svgKey: 'beras' },
+            { name: 'Buah Semangka', svgKey: 'semangka' },
+            { name: 'Bungkus Gula Pasir', svgKey: 'gula' }
+          ]
+        },
+        hg: {
+          symbol: 'hg (ons)',
+          fullName: 'Hektogram (hg) / Ons',
+          equivalence: '1 hg = 1 ons = 100 g',
+          description: 'Satuan yang sering digunakan pedagang buah, sayur, dan bumbu saat berbelanja di pasar. Hektogram (hg) sama dengan ons!',
+          comparison: 'Lebih ringan daripada 1 kg (butuh 10 hg/ons untuk menyamai 1 kg), tetapi lebih berat daripada 1 dag.',
+          trigger: 'Pernahkah ibu meminta dibelikan bawang merah 2 ons? Tahukah kamu bahwa 2 ons sama artinya dengan 2 hg?',
+          borderColor: '#0284C7',
+          objects: [
+            { name: 'Buah Apel', svgKey: 'apel' },
+            { name: 'Cabai Rawit', svgKey: 'cabai' },
+            { name: 'Potongan Mentega Kecil', svgKey: 'mentega' }
+          ]
+        },
+        dag: {
+          symbol: 'dag',
+          fullName: 'Dekagram (dag)',
+          equivalence: '1 dag = 10 g',
+          description: 'Satuan di lantai kedua untuk mengukur benda-benda yang lebih ringan, berukuran kecil, dan mudah digenggam di telapak tangan.',
+          comparison: 'Lebih ringan daripada 1 hg (1 hg = 10 dag), tetapi 10 kali lebih berat daripada 1 g (1 dag = 10 g).',
+          trigger: 'Coba lihat isi kotak pensilmu! Benda apa yang ringan dan cocok diukur dengan satuan dag?',
+          borderColor: '#16A34A',
+          objects: [
+            { name: 'Penghapus Karet', svgKey: 'penghapus' },
+            { name: 'Tiga Butir Permen', svgKey: 'permen' },
+            { name: '1 Sendok Makan Gula', svgKey: 'sendok_gula' }
+          ]
+        },
+        g: {
+          symbol: 'g',
+          fullName: 'Gram (g)',
+          equivalence: '1.000 g = 1 kg',
+          description: 'Satuan berat paling kecil di lantai dasar menara, digunakan untuk benda-benda yang sangat ringan.',
+          comparison: 'Merupakan satuan paling ringan; diperlukan 1.000 g untuk menyamai berat 1 kg.',
+          trigger: 'Jika kamu meletakkan satu klip kertas di telapak tangan, apakah terasa berat? Satuan apa yang paling tepat?',
+          borderColor: '#D97706',
+          objects: [
+            { name: 'Klip Kertas', svgKey: 'klip' },
+            { name: 'Peniti Kecil', svgKey: 'peniti' },
+            { name: 'Daun Salam Kering', svgKey: 'daun' }
+          ]
+        }
+      };
+
+      const EXERCISES_DATA = [
+        {
+          id: 1,
+          skill: 'Latihan 1 • Urutkan Terbesar ke Terkecil',
+          prompt: 'Urutkan label satuan berikut dari terbesar ke terkecil: dag, kg, g, hg.',
+          options: ['kg, hg, dag, g', 'g, dag, hg, kg', 'kg, dag, hg, g'],
+          correctIndex: 0,
+          horizontal: false,
+          explanation: 'Gunakan jembatan keledai “Kucing Hitam Dalam Got” dari puncak tangga ke lantai dasar: kg, hg, dag, g.'
+        },
+        {
+          id: 2,
+          skill: 'Latihan 2 • Urutkan Terkecil ke Terbesar',
+          prompt: 'Urutkan label satuan berikut dari terkecil ke terbesar: ons, g, kg, dag.',
+          options: ['kg, ons, dag, g', 'g, dag, ons, kg', 'g, ons, dag, kg'],
+          correctIndex: 1,
+          horizontal: false,
+          explanation: 'Ingat ons sama dengan hg. Urutan naik dari lantai dasar menuju puncak adalah g, dag, ons, kg.'
+        },
+        {
+          id: 3,
+          skill: 'Latihan 3 • Membandingkan Satuan Berat',
+          prompt: 'Pilih tanda perbandingan yang tepat: 4 kg □ 400 g.',
+          options: ['>', '<', '='],
+          correctIndex: 0,
+          horizontal: true,
+          explanation: '4 kg = 4.000 g. Karena 4.000 g lebih besar daripada 400 g, tanda yang tepat adalah >.'
+        },
+        {
+          id: 4,
+          skill: 'Latihan 4 • Melengkapi Kesetaraan Antarsatuan',
+          prompt: 'Lengkapilah hubungan antarsatuan berikut: 1 hg = ... ons = ... g.',
+          options: ['10 ons dan 10 g', '1 ons dan 1.000 g', '1 ons dan 100 g'],
+          correctIndex: 2,
+          horizontal: false,
+          explanation: '1 hektogram (hg) sama dengan 1 ons dan setara dengan 100 gram (1 hg = 1 ons = 100 g).'
+        },
+        {
+          id: 5,
+          skill: 'Latihan 5 • Konversi Sederhana',
+          prompt: 'Ibu membeli 6 ons bawang merah. Berapa gram berat bawang merah tersebut?',
+          options: ['A. 60 g', 'B. 600 g', 'C. 6.000 g'],
+          correctIndex: 1,
+          horizontal: false,
+          explanation: '1 ons = 100 g. Maka 6 ons = 6 × 100 g = 600 g.'
+        }
+      ];
+
+      const CHALLENGES_DATA = [
+        {
+          id: 1,
+          prompt: '3 kg jeruk = ... hg.',
+          answer: '30 hg.',
+          explanation: 'Dari kg ke hg turun 1 tingkat, berarti dikali 10: 3 × 10 = 30 hg.'
+        },
+        {
+          id: 2,
+          prompt: '500 g tepung = ... ons.',
+          answer: '5 ons.',
+          explanation: 'Ingat 100 g = 1 hg = 1 ons. Naik 2 tingkat dari g ke hg (ons) dibagi 100: 500 ÷ 100 = 5 ons.'
+        },
+        {
+          id: 3,
+          prompt: 'Paket mana yang paling berat? Paket A: 2 kg | Paket B: 15 hg | Paket C: 1.800 g.',
+          answer: 'Paket A (2 kg).',
+          explanation: '2 kg = 2.000 g. 15 hg = 1.500 g. 1.800 g tetap 1.800 g. Jadi, Paket A paling berat.'
+        },
+        {
+          id: 4,
+          prompt: 'Urutkan dari paling ringan ke paling berat: 4 dag, 1 hg, 20 g.',
+          answer: '20 g, 4 dag, 1 hg.',
+          explanation: '4 dag = 40 g. 1 hg = 100 g. Urutannya dari ringan ke berat adalah 20 g, 40 g (4 dag), 100 g (1 hg).'
+        },
+        {
+          id: 5,
+          prompt: '7 dag = ... g.',
+          answer: '70 g.',
+          explanation: 'Dari dag ke g turun 1 tingkat, berarti dikali 10: 7 × 10 = 70 g.'
+        }
+      ];
+
+      /* ----------------------------------------------------------------------
+         2. STATE TERPUSAT APLIKASI
+         ---------------------------------------------------------------------- */
+      const appState = {
+        currentPage: 1,
+        isMuted: false,
+        tvFitMode: 0, // 0 = Penuh (100%), 1 = Aman TV (96%), 2 = Kompak (92%)
+
+        // Halaman 2
+        selectedUnit: 'kg',
+
+        // Halaman 3
+        ladderStep: 0, // 0=kg, 1=hg, 2=dag, 3=g
+
+        // Halaman 4 (Simulasi Lift)
+        simStartValue: 1,
+        simStartFloor: 0,
+        simCurrentFloor: 0,
+        simLastOpText: '1 × 1 = 1',
+
+        // Halaman 5 (Latihan Interaktif)
+        activeExerciseIdx: 0,
+        exerciseSolved: [false, false, false, false, false],
+        exerciseSelectedOption: [null, null, null, null, null],
+        exerciseExpOpen: [false, false, false, false, false],
+
+        // Halaman 6 (Tantangan Akhir)
+        activeChallengeIdx: 0,
+        challengeRevealed: [false, false, false, false, false]
+      };
+
+      /* ----------------------------------------------------------------------
+         3. GENERATOR ILUSTRASI SVG INLINE (SI KUCING HITAM & BENDA KONKRET)
+         ---------------------------------------------------------------------- */
+      function getCatSVG(expression) {
+        const isCelebrating = expression === 'celebrating';
+        const isThinking = expression === 'thinking';
+
+        const mouthSVG = isCelebrating
+          ? '<path d="M42,66 Q50,76 58,66 Z" fill="#F43F5E" stroke="#FFFFFF" stroke-width="1.5"/>'
+          : isThinking
+          ? '<path d="M45,68 Q50,65 55,68" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>'
+          : '<path d="M43,66 Q50,72 57,66" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>';
+
+        const pawSVG = isCelebrating
+          ? '<circle cx="22" cy="52" r="7" fill="#1E293B" stroke="#F59E0B" stroke-width="2"/><circle cx="78" cy="52" r="7" fill="#1E293B" stroke="#F59E0B" stroke-width="2"/>'
+          : isThinking
+          ? '<circle cx="64" cy="70" r="7" fill="#1E293B" stroke="#F59E0B" stroke-width="2"/><text x="80" y="34" font-size="16" font-weight="900" fill="#F59E0B">?</text>'
+          : '<circle cx="80" cy="62" r="7" fill="#1E293B" stroke="#F59E0B" stroke-width="2"/><path d="M85,52 Q90,56 87,62" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>';
+
+        const starsSVG = isCelebrating
+          ? '<polygon points="16,22 18,27 23,27 19,30 20,35 16,32 12,35 13,30 9,27 14,27" fill="#F59E0B"/><polygon points="84,20 86,25 91,25 87,28 88,33 84,30 80,33 81,28 77,25 82,25" fill="#F59E0B"/>'
+          : '';
+
+        return `
+          <svg viewBox="0 0 100 100" style="width:100%; height:100%; overflow:visible;" aria-label="Karakter Si Kucing Hitam">
+            ${starsSVG}
+            <ellipse cx="50" cy="84" rx="22" ry="14" fill="#1E293B"/>
+            <polygon points="26,44 30,22 44,36" fill="#1E293B" stroke="#0F172A" stroke-width="2"/>
+            <polygon points="74,44 70,22 56,36" fill="#1E293B" stroke="#0F172A" stroke-width="2"/>
+            <polygon points="30,41 32,27 41,36" fill="#F472B6"/>
+            <polygon points="70,41 68,27 59,36" fill="#F472B6"/>
+            <circle cx="50" cy="54" r="24" fill="#1E293B" stroke="#0F172A" stroke-width="2"/>
+            <ellipse cx="50" cy="33" rx="20" ry="5" fill="#0284C7" stroke="#0F172A" stroke-width="1.5"/>
+            <path d="M35,33 L38,21 Q50,17 62,21 L65,33 Z" fill="#0284C7" stroke="#0F172A" stroke-width="1.5"/>
+            <rect x="36" y="29" width="28" height="4" fill="#F59E0B"/>
+            <circle cx="50" cy="25" r="3.5" fill="#F59E0B"/>
+            <circle cx="41" cy="52" r="5.5" fill="#FFFFFF"/>
+            <circle cx="59" cy="52" r="5.5" fill="#FFFFFF"/>
+            <circle cx="42" cy="52" r="3" fill="#0F172A"/>
+            <circle cx="60" cy="52" r="3" fill="#0F172A"/>
+            <circle cx="43" cy="50.5" r="1.1" fill="#FFFFFF"/>
+            <circle cx="61" cy="50.5" r="1.1" fill="#FFFFFF"/>
+            <polygon points="47,59 53,59 50,62.5" fill="#F472B6"/>
+            <line x1="24" y1="58" x2="36" y2="60" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="24" y1="63" x2="36" y2="63" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="64" y1="60" x2="76" y2="58" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="64" y1="63" x2="76" y2="63" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/>
+            ${mouthSVG}
+            <path d="M34,74 Q50,80 66,74" fill="none" stroke="#DC2626" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="50" cy="79" r="5.5" fill="#F59E0B" stroke="#78350F" stroke-width="1.5"/>
+            <circle cx="50" cy="80" r="1.5" fill="#78350F"/>
+            ${pawSVG}
+          </svg>
+        `;
+      }
+
+      function getConcreteObjectSVG(key) {
+        const svgs = {
+          beras: `<svg viewBox="0 0 80 64"><rect x="18" y="14" width="44" height="44" rx="8" fill="#F8FAFC" stroke="#0284C7" stroke-width="3"/><path d="M18,22 Q40,10 62,22" fill="#0284C7"/><text x="40" y="42" text-anchor="middle" font-size="12" font-weight="900" fill="#0F172A">BERAS</text></svg>`,
+          semangka: `<svg viewBox="0 0 80 64"><circle cx="40" cy="34" r="24" fill="#16A34A" stroke="#14532D" stroke-width="3"/><path d="M32,12 Q26,34 32,56 M48,12 Q54,34 48,56" fill="none" stroke="#14532D" stroke-width="3"/></svg>`,
+          gula: `<svg viewBox="0 0 80 64"><rect x="20" y="12" width="40" height="44" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="3"/><text x="40" y="38" text-anchor="middle" font-size="12" font-weight="900" fill="#92400E">GULA</text></svg>`,
+          apel: `<svg viewBox="0 0 80 64"><circle cx="40" cy="36" r="20" fill="#DC2626" stroke="#7F1D1D" stroke-width="2.5"/><path d="M40,16 Q42,8 48,8" fill="none" stroke="#78350F" stroke-width="3" stroke-linecap="round"/><ellipse cx="47" cy="14" rx="7" ry="4" fill="#16A34A"/></svg>`,
+          cabai: `<svg viewBox="0 0 80 64"><path d="M22,44 Q38,52 58,22 Q50,18 44,24 Q34,38 22,44 Z" fill="#DC2626" stroke="#7F1D1D" stroke-width="2.5"/><path d="M54,20 L62,13" stroke="#16A34A" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+          mentega: `<svg viewBox="0 0 80 64"><rect x="14" y="24" width="52" height="24" rx="5" fill="#FDE047" stroke="#CA8A04" stroke-width="3"/><text x="40" y="40" text-anchor="middle" font-size="10" font-weight="900" fill="#713F12">MENTEGA</text></svg>`,
+          penghapus: `<svg viewBox="0 0 80 64"><rect x="16" y="22" width="48" height="24" rx="5" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/><rect x="16" y="22" width="22" height="24" rx="4" fill="#38BDF8" stroke="#0F172A" stroke-width="2.5"/></svg>`,
+          permen: `<svg viewBox="0 0 80 64"><circle cx="24" cy="34" r="10" fill="#F59E0B" stroke="#78350F" stroke-width="2"/><circle cx="42" cy="24" r="10" fill="#EC4899" stroke="#831843" stroke-width="2"/><circle cx="54" cy="40" r="10" fill="#10B981" stroke="#065F46" stroke-width="2"/></svg>`,
+          sendok_gula: `<svg viewBox="0 0 80 64"><ellipse cx="28" cy="34" rx="16" ry="10" fill="#CBD5E1" stroke="#475569" stroke-width="2.5"/><path d="M16,32 Q28,20 40,32 Z" fill="#FFFFFF"/><line x1="44" y1="34" x2="68" y2="34" stroke="#475569" stroke-width="5" stroke-linecap="round"/></svg>`,
+          klip: `<svg viewBox="0 0 80 64"><path d="M24,38 L52,38 A8,8 0 0,0 52,22 L26,22 A5,5 0 0,0 26,32 L48,32" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+          peniti: `<svg viewBox="0 0 80 64"><rect x="18" y="26" width="44" height="12" rx="6" fill="none" stroke="#64748B" stroke-width="3"/><circle cx="58" cy="32" r="5" fill="#94A3B8"/></svg>`,
+          daun: `<svg viewBox="0 0 80 64"><path d="M18,44 Q38,14 62,22 Q50,50 18,44 Z" fill="#A3E635" stroke="#4D7C0F" stroke-width="2.5"/><line x1="18" y1="44" x2="56" y2="25" stroke="#4D7C0F" stroke-width="2"/></svg>`
+        };
+        return svgs[key] || svgs.klip;
+      }
+
+      /* ----------------------------------------------------------------------
+         4. SISTEM AUDIO SINTETIS OFFLINE (WEB AUDIO API)
+         ---------------------------------------------------------------------- */
+      const SoundEngine = {
+        ctx: null,
+        ensureCtx() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.ctx = new AudioCtx();
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        },
+        playTone(freq, duration, type = 'sine', gainVal = 0.18, delay = 0) {
+          if (appState.isMuted) return;
+          try {
+            this.ensureCtx();
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime + delay;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(gainVal, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + duration);
+          } catch (e) {
+            // Abaikan pembatasan autoplay
+          }
+        },
+        playBell() {
+          this.playTone(1046.5, 0.5, 'sine', 0.2, 0);
+          this.playTone(1567.98, 0.4, 'triangle', 0.12, 0.04);
+        },
+        playCoinIn() {
+          this.playTone(987.77, 0.14, 'sine', 0.2, 0);
+          this.playTone(1318.51, 0.3, 'sine', 0.22, 0.08);
+        },
+        playCoinOut() {
+          this.playTone(880, 0.14, 'triangle', 0.18, 0);
+          this.playTone(659.25, 0.26, 'triangle', 0.18, 0.08);
+        },
+        playCorrect() {
+          this.playTone(523.25, 0.16, 'sine', 0.2, 0);
+          this.playTone(659.25, 0.16, 'sine', 0.2, 0.09);
+          this.playTone(783.99, 0.32, 'sine', 0.22, 0.18);
+        },
+        playRetry() {
+          this.playTone(392.0, 0.2, 'triangle', 0.15, 0);
+          this.playTone(349.23, 0.26, 'triangle', 0.15, 0.13);
+        },
+        playFanfare() {
+          this.playTone(523.25, 0.15, 'triangle', 0.22, 0);
+          this.playTone(659.25, 0.15, 'triangle', 0.22, 0.11);
+          this.playTone(783.99, 0.15, 'triangle', 0.22, 0.22);
+          this.playTone(1046.5, 0.5, 'triangle', 0.25, 0.33);
+        }
+      };
+
+      /* ----------------------------------------------------------------------
+         5. MESIN MATEMATIKA BERBASIS INDEKS (PENCEGAHAN MISKONSEPSI)
+         ---------------------------------------------------------------------- */
+      function formatNumberID(num) {
+        return num.toLocaleString('id-ID');
+      }
+
+      function calculateWeightByIndex(startValue, startFloorIdx, targetFloorIdx) {
+        const exponent = targetFloorIdx - startFloorIdx;
+        return startValue * Math.pow(10, exponent);
+      }
+
+      function countVisualZeroCoins(numericValue) {
+        if (!Number.isInteger(numericValue) || numericValue <= 0) return 0;
+        let temp = numericValue;
+        let zeros = 0;
+        while (temp >= 10 && temp % 10 === 0) {
+          zeros++;
+          temp = temp / 10;
+        }
+        return zeros;
+      }
+
+      function extractLeadingBaseNumber(numericValue) {
+        if (!Number.isInteger(numericValue) || numericValue <= 0) return numericValue;
+        let temp = numericValue;
+        while (temp >= 10 && temp % 10 === 0) {
+          temp = temp / 10;
+        }
+        return temp;
+      }
+
+      /* ----------------------------------------------------------------------
+         6. NAVIGASI ENAM HALAMAN & RENDER KONTEN
+         ---------------------------------------------------------------------- */
+      function navigateToPage(pageNum) {
+        const target = Math.max(1, Math.min(6, pageNum));
+        appState.currentPage = target;
+
+        document.querySelectorAll('.page-view').forEach((sec) => {
+          sec.classList.remove('active');
+        });
+        const activeSec = document.getElementById(`page-${target}`);
+        if (activeSec) activeSec.classList.add('active');
+
+        document.querySelectorAll('.tab-btn').forEach((btn) => {
+          const btnPage = Number(btn.getAttribute('data-page'));
+          btn.classList.toggle('active', btnPage === target);
+        });
+
+        document.getElementById('headerChapterBadge').textContent = `Bab ${target} / 6`;
+
+        const btnPrev = document.getElementById('btnNavPrev');
+        const btnNext = document.getElementById('btnNavNext');
+        btnPrev.disabled = target === 1;
+
+        if (target === 6) {
+          btnNext.textContent = '🎉 Rayakan!';
+          btnNext.classList.remove('btn-primary');
+          btnNext.classList.add('btn-gold');
+        } else {
+          btnNext.textContent = 'Selanjutnya ▶';
+          btnNext.classList.remove('btn-gold');
+          btnNext.classList.add('btn-primary');
+        }
+
+        if (target === 2) renderUnitDetail();
+        if (target === 3) updateLadderUI();
+        if (target === 4) updateSimulatorUI();
+        if (target === 5) renderExercisePage();
+        if (target === 6) renderChallengePage();
+      }
+
+      /* ----------------------------------------------------------------------
+         7. LOGIKA HALAMAN 2: KENALI EMPAT SATUAN BERAT
+         ---------------------------------------------------------------------- */
+      function renderUnitDetail() {
+        const uKey = appState.selectedUnit;
+        const data = UNIT_DETAILS_DATA[uKey];
+
+        document.querySelectorAll('.unit-card-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.getAttribute('data-unit') === uKey);
+        });
+
+        const panel = document.getElementById('unitDetailPanel');
+        panel.style.borderColor = data.borderColor;
+
+        const objectsHTML = data.objects
+          .map(
+            (obj) => `
+            <div class="obj-item">
+              ${getConcreteObjectSVG(obj.svgKey)}
+              <span>${obj.name}</span>
+            </div>
+          `
+          )
+          .join('');
+
+        panel.innerHTML = `
+          <div>
+            <div class="unit-detail-header">
+              <h3>${data.fullName}</h3>
+              <span class="eq-pill">${data.equivalence}</span>
+            </div>
+            <p style="font-size: var(--fs-body); font-weight: 700; margin-top: 4px; color: var(--text-navy);">
+              ${data.description}
+            </p>
+          </div>
+
+          <div class="objects-showcase">
+            ${objectsHTML}
+          </div>
+
+          <div class="unit-meta-boxes">
+            <div class="meta-box">
+              <strong>⚖️ Perbandingan Berat:</strong><br/>
+              ${data.comparison}
+            </div>
+            <div class="meta-box" style="background:#F0F9FF; border-color:#7DD3FC;">
+              <strong>💬 Pertanyaan Pemantik:</strong><br/>
+              “${data.trigger}”
+            </div>
+          </div>
+        `;
+      }
+
+      /* ----------------------------------------------------------------------
+         8. LOGIKA HALAMAN 3: PETUALANGAN TANGGA SATUAN
+         ---------------------------------------------------------------------- */
+      function updateLadderUI(customMessage) {
+        const step = appState.ladderStep;
+        document.querySelectorAll('.step-row').forEach((row) => {
+          const rStep = Number(row.getAttribute('data-step'));
+          row.classList.toggle('active', rStep === step);
+        });
+
+        const catSprite = document.getElementById('ladderCatSprite');
+        const topPositions = ['2%', '27%', '52%', '77%'];
+        const leftPositions = ['33%', '51%', '69%', '85%'];
+        catSprite.style.top = topPositions[step];
+        catSprite.style.left = leftPositions[step];
+
+        document.getElementById('btnLadderUp').disabled = step === 0;
+        document.getElementById('btnLadderDown').disabled = step === 3;
+
+        if (customMessage) {
+          document.getElementById('ladderFeedbackBox').innerHTML = `<div>${customMessage}</div>`;
+        }
+      }
+
+      function animateLadderSequence(direction) {
+        const order = direction === 'desc' ? [0, 1, 2, 3] : [3, 2, 1, 0];
+        const rows = document.querySelectorAll('.step-row');
+        rows.forEach((r) => r.classList.remove('seq-glow'));
+
+        order.forEach((stepIdx, idx) => {
+          setTimeout(() => {
+            rows.forEach((r) => r.classList.remove('seq-glow'));
+            const targetRow = document.querySelector(`.step-row[data-step="${stepIdx}"]`);
+            if (targetRow) targetRow.classList.add('seq-glow');
+            appState.ladderStep = stepIdx;
+            updateLadderUI(
+              direction === 'desc'
+                ? '🔽 <strong>Urutan Terbesar ke Terkecil:</strong> kg → hg (ons) → dag → g (Setiap turun 1 tingkat dikali 10).'
+                : '🔼 <strong>Urutan Terkecil ke Terbesar:</strong> g → dag → hg (ons) → kg (Setiap naik 1 tingkat dibagi 10).'
+            );
+            SoundEngine.playBell();
+          }, idx * 400);
+        });
+
+        setTimeout(() => {
+          rows.forEach((r) => r.classList.remove('seq-glow'));
+        }, order.length * 400 + 350);
+      }
+
+      /* ----------------------------------------------------------------------
+         9. LOGIKA HALAMAN 4: SIMULASI LIFT ANGKA NOL (FITUR INTI)
+         ---------------------------------------------------------------------- */
+      function updateSimulatorUI() {
+        const startVal = appState.simStartValue;
+        const startIdx = appState.simStartFloor;
+        const currIdx = appState.simCurrentFloor;
+
+        const startUnitKey = UNITS_LIST[startIdx];
+        const currUnitKey = UNITS_LIST[currIdx];
+
+        const currentValue = calculateWeightByIndex(startVal, startIdx, currIdx);
+
+        const cabin = document.getElementById('elevatorCabin');
+        const cabinTopMap = ['1.5%', '26.5%', '51.5%', '75.5%'];
+        cabin.style.top = cabinTopMap[currIdx];
+
+        const formattedCurrent = formatNumberID(currentValue);
+        const formattedStart = formatNumberID(startVal);
+
+        document.getElementById('cabinReadout').textContent = `${formattedCurrent} ${currUnitKey}`;
+
+        document.querySelectorAll('.tower-floor').forEach((fl) => {
+          const fIdx = Number(fl.getAttribute('data-floor'));
+          fl.classList.toggle('current-floor', fIdx === currIdx);
+        });
+
+        document.querySelectorAll('[data-base]').forEach((b) => {
+          b.classList.toggle('active', Number(b.getAttribute('data-base')) === startVal && startVal <= 5);
+        });
+        document.querySelectorAll('[data-startunit]').forEach((b) => {
+          b.classList.toggle('active', b.getAttribute('data-startunit') === startUnitKey);
+        });
+
+        const btnDown = document.getElementById('btnLiftDown');
+        const btnUp = document.getElementById('btnLiftUp');
+        btnDown.disabled = currIdx >= 3;
+        btnUp.disabled = currIdx <= 0 || currentValue < 10;
+
+        document.getElementById('simStartDisplay').textContent = `${formattedStart} ${UNIT_LABELS[startUnitKey]}`;
+        document.getElementById('simTargetDisplay').textContent = FLOOR_TITLES[currUnitKey];
+        document.getElementById('simFormulaDisplay').textContent = appState.simLastOpText;
+        document.getElementById('simResultDisplay').textContent = `${formattedCurrent} ${currUnitKey}`;
+
+        const zeroCount = countVisualZeroCoins(currentValue);
+        const baseDigit = extractLeadingBaseNumber(currentValue);
+        document.getElementById('coinRackCaption').textContent = `Visualisasi Koin Angka 0 (${zeroCount} koin):`;
+
+        const coinsContainer = document.getElementById('coinsContainer');
+        let coinsHTML = `<span class="base-digit-pill">${formatNumberID(baseDigit)}</span>`;
+        for (let i = 0; i < zeroCount; i++) {
+          coinsHTML += `<span class="zero-coin" title="Koin Angka 0 (Visualisasi ×10)">0</span>`;
+        }
+        coinsContainer.innerHTML = coinsHTML;
+      }
+
+      function stepLiftDown() {
+        if (appState.simCurrentFloor >= 3) return;
+        const prevValue = calculateWeightByIndex(
+          appState.simStartValue,
+          appState.simStartFloor,
+          appState.simCurrentFloor
+        );
+        appState.simCurrentFloor += 1;
+        const nextValue = calculateWeightByIndex(
+          appState.simStartValue,
+          appState.simStartFloor,
+          appState.simCurrentFloor
+        );
+        appState.simLastOpText = `${formatNumberID(prevValue)} × 10 = ${formatNumberID(nextValue)}`;
+        updateSimulatorUI();
+        SoundEngine.playBell();
+        setTimeout(() => SoundEngine.playCoinIn(), 280);
+      }
+
+      function stepLiftUp() {
+        if (appState.simCurrentFloor <= 0) return;
+        const prevValue = calculateWeightByIndex(
+          appState.simStartValue,
+          appState.simStartFloor,
+          appState.simCurrentFloor
+        );
+        if (prevValue < 10) return;
+        appState.simCurrentFloor -= 1;
+        const nextValue = calculateWeightByIndex(
+          appState.simStartValue,
+          appState.simStartFloor,
+          appState.simCurrentFloor
+        );
+        appState.simLastOpText = `${formatNumberID(prevValue)} ÷ 10 = ${formatNumberID(nextValue)}`;
+        updateSimulatorUI();
+        SoundEngine.playBell();
+        setTimeout(() => SoundEngine.playCoinOut(), 280);
+      }
+
+      function resetLift(startVal, startUnitKey) {
+        const idx = UNIT_INDEX[startUnitKey];
+        appState.simStartValue = startVal;
+        appState.simStartFloor = idx;
+        appState.simCurrentFloor = idx;
+        appState.simLastOpText = `${formatNumberID(startVal)} × 1 = ${formatNumberID(startVal)}`;
+        updateSimulatorUI();
+      }
+
+      /* ----------------------------------------------------------------------
+         10. LOGIKA HALAMAN 5: LATIHAN INTERAKTIF LIMA KETERAMPILAN
+         ---------------------------------------------------------------------- */
+      function renderExercisePage() {
+        const idx = appState.activeExerciseIdx;
+        const ex = EXERCISES_DATA[idx];
+
+        const tabsList = document.getElementById('exerciseTabsList');
+        tabsList.innerHTML = EXERCISES_DATA.map((item, i) => {
+          const isSolved = appState.exerciseSolved[i];
+          const isActive = i === idx;
+          return `
+            <button type="button" class="ex-tab ${isActive ? 'active' : ''} ${isSolved ? 'solved' : ''}" data-exidx="${i}">
+              <span>${isSolved ? '⭐' : '📝'}</span>
+              <span>Soal ${item.id}</span>
+            </button>
+          `;
+        }).join('');
+
+        const solvedCount = appState.exerciseSolved.filter(Boolean).length;
+        document.getElementById('exerciseStarsTracker').textContent = `⭐ Bintang Latihan: ${solvedCount} / 5`;
+
+        document.getElementById('exSkillBadge').textContent = ex.skill;
+        document.getElementById('exPromptText').textContent = ex.prompt;
+
+        const optGrid = document.getElementById('exOptionsGrid');
+        optGrid.classList.toggle('horizontal', Boolean(ex.horizontal));
+
+        const chosen = appState.exerciseSelectedOption[idx];
+        const isAlreadySolved = appState.exerciseSolved[idx];
+
+        optGrid.innerHTML = ex.options
+          .map((optText, optIdx) => {
+            let extraClass = '';
+            if (chosen !== null) {
+              if (optIdx === ex.correctIndex && chosen === optIdx) extraClass = 'correct';
+              else if (optIdx === chosen && chosen !== ex.correctIndex) extraClass = 'wrong';
+            }
+            return `
+              <button type="button" class="option-btn ${extraClass}" data-optidx="${optIdx}" ${isAlreadySolved ? 'disabled' : ''}>
+                ${optText}
+              </button>
+            `;
+          })
+          .join('');
+
+        const feedbackEl = document.getElementById('exFeedbackStatus');
+        const retryBtn = document.getElementById('btnExRetry');
+        const nextQBtn = document.getElementById('btnExNextQuestion');
+        const catMount = document.getElementById('exCatMount');
+
+        nextQBtn.textContent = idx < EXERCISES_DATA.length - 1 ? 'Soal Berikutnya ▶' : 'Lanjut ke Tantangan ▶';
+
+        if (chosen === null) {
+          feedbackEl.className = 'feedback-status neutral';
+          feedbackEl.textContent = 'Diskusikan dengan teman sebangkumu, lalu pilih jawaban yang paling tepat!';
+          retryBtn.style.display = 'none';
+          catMount.innerHTML = getCatSVG('greeting');
+        } else if (chosen === ex.correctIndex) {
+          feedbackEl.className = 'feedback-status success';
+          feedbackEl.textContent = '✅ Hebat! Jawaban kalian benar sekali!';
+          retryBtn.style.display = 'none';
+          catMount.innerHTML = getCatSVG('celebrating');
+        } else {
+          feedbackEl.className = 'feedback-status retry';
+          feedbackEl.textContent = '🤔 Belum tepat. Ayo coba cek kembali urutan tangganya!';
+          retryBtn.style.display = 'inline-flex';
+          catMount.innerHTML = getCatSVG('thinking');
+        }
+
+        const expBox = document.getElementById('exExplanationBox');
+        const expHeader = document.getElementById('exExpHeader');
+        const expText = document.getElementById('exExplanationText');
+
+        if (appState.exerciseExpOpen[idx]) {
+          expBox.classList.add('unlocked');
+          expHeader.style.color = 'var(--emerald-green-dark)';
+          expHeader.textContent = '📖 Pembahasan Sederhana:';
+          expText.textContent = ex.explanation;
+        } else {
+          expBox.classList.remove('unlocked');
+          expHeader.style.color = 'var(--sky-blue-dark)';
+          expHeader.textContent = '📖 Kotak Pembahasan:';
+          expText.innerHTML = 'Pilih salah satu jawaban di sebelah kiri atau klik tombol <strong>Lihat Pembahasan</strong> untuk membuka cara menghitungnya.';
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         11. LOGIKA HALAMAN 6: TANTANGAN AKHIR & LAYAR APRESIASI
+         ---------------------------------------------------------------------- */
+      function renderChallengePage() {
+        const idx = appState.activeChallengeIdx;
+        const ch = CHALLENGES_DATA[idx];
+        const isRevealed = appState.challengeRevealed[idx];
+
+        document.getElementById('challengeCounterLabel').textContent = `Tantangan ${idx + 1} dari 5`;
+        document.getElementById('challengeTag').textContent = `Misi Evaluasi #${ch.id}`;
+        document.getElementById('challengePromptText').textContent = ch.prompt;
+
+        const starsStr = appState.challengeRevealed.map((rev) => (rev ? '⭐' : '☆')).join(' ');
+        document.getElementById('challengeStarsRow').textContent = starsStr;
+
+        const revealSlot = document.getElementById('challengeRevealSlot');
+        const revealBtn = document.getElementById('btnRevealChallenge');
+        const catMount = document.getElementById('challengeCatMount');
+        const sideHint = document.getElementById('challengeSideHint');
+        const ansText = document.getElementById('challengeAnswerText');
+        const expText = document.getElementById('challengeExpText');
+
+        if (isRevealed) {
+          revealSlot.className = 'challenge-reveal-slot unlocked';
+          ansText.textContent = `✅ Jawaban: ${ch.answer}`;
+          expText.textContent = `📖 Pembahasan: ${ch.explanation}`;
+          revealBtn.textContent = '✅ Kunci & Pembahasan Sudah Dibuka';
+          revealBtn.disabled = true;
+          catMount.innerHTML = getCatSVG('celebrating');
+          sideHint.innerHTML = 'Bagus sekali! Cocokkan jawaban di <strong>Buku Log</strong> kalian dengan layar ini.';
+        } else {
+          revealSlot.className = 'challenge-reveal-slot locked';
+          ansText.textContent = '🔒 Kunci Jawaban Masih Tertutup';
+          expText.innerHTML = 'Hitung bersama teman sebangkumu di LKPD Buku Log terlebih dahulu, kemudian klik tombol <strong>Buka Kunci &amp; Pembahasan</strong> di bawah!';
+          revealBtn.textContent = '🔓 Buka Kunci & Pembahasan';
+          revealBtn.disabled = false;
+          catMount.innerHTML = getCatSVG('thinking');
+          sideHint.innerHTML = 'Ayo hitung bersama pasanganmu di <strong>Buku Log</strong>! Gunakan aturan <strong>×10</strong> dan <strong>÷10</strong>.';
+        }
+
+        document.getElementById('btnPrevChallenge').disabled = idx === 0;
+        document.getElementById('btnNextChallenge').disabled = idx === CHALLENGES_DATA.length - 1;
+      }
+
+      function openCelebrationModal() {
+        const overlay = document.getElementById('celebrationOverlay');
+        const card = document.getElementById('celebrationCard');
+        document.getElementById('celebCatMount').innerHTML = getCatSVG('celebrating');
+
+        card.querySelectorAll('.confetti-piece').forEach((el) => el.remove());
+
+        const colors = ['#F59E0B', '#0284C7', '#16A34A', '#DC2626', '#EC4899'];
+        for (let i = 0; i < 28; i++) {
+          const piece = document.createElement('div');
+          piece.className = 'confetti-piece';
+          piece.style.left = `${Math.random() * 96 + 2}%`;
+          piece.style.top = `${-10 - Math.random() * 30}px`;
+          piece.style.backgroundColor = colors[i % colors.length];
+          piece.style.animationDelay = `${Math.random() * 1.4}s`;
+          card.appendChild(piece);
+        }
+
+        overlay.classList.add('active');
+        SoundEngine.playFanfare();
+      }
+
+      /* ----------------------------------------------------------------------
+         12. INISIALISASI EVENT LISTENERS, KONTROL SMART TV & RENDER AWAL
+         ---------------------------------------------------------------------- */
+      function initApp() {
+        document.getElementById('headerCatAvatar').innerHTML = getCatSVG('greeting');
+        document.getElementById('p1CatMascot').innerHTML = getCatSVG('greeting');
+        document.getElementById('ladderCatSprite').innerHTML = getCatSVG('greeting');
+        document.getElementById('cabinCatMount').innerHTML = getCatSVG('greeting');
+
+        // Kontrol 1: Ukuran TV / Overscan Fit
+        const btnTvFit = document.getElementById('btnTvFit');
+        const tvFitLabel = document.getElementById('tvFitLabel');
+        btnTvFit.addEventListener('click', () => {
+          appState.tvFitMode = (appState.tvFitMode + 1) % 3;
+          document.body.classList.remove('tv-fit-compact', 'tv-fit-ultra');
+          if (appState.tvFitMode === 1) {
+            document.body.classList.add('tv-fit-compact');
+            tvFitLabel.textContent = 'TV: Aman 96%';
+          } else if (appState.tvFitMode === 2) {
+            document.body.classList.add('tv-fit-ultra');
+            tvFitLabel.textContent = 'TV: Kompak 92%';
+          } else {
+            tvFitLabel.textContent = 'TV: Penuh';
+          }
+          SoundEngine.playBell();
+        });
+
+        // Kontrol 2: Mode Layar Penuh (Fullscreen) Smart TV
+        const btnFullscreen = document.getElementById('btnFullscreen');
+        const fullscreenLabel = document.getElementById('fullscreenLabel');
+        btnFullscreen.addEventListener('click', () => {
+          if (!document.fullscreenElement) {
+            if (document.documentElement.requestFullscreen) {
+              document.documentElement.requestFullscreen().catch(() => {});
+            }
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen().catch(() => {});
+            }
+          }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+          fullscreenLabel.textContent = document.fullscreenElement ? 'Keluar Penuh' : 'Layar Penuh';
+        });
+
+        // Kontrol 3: Mute / Unmute Global
+        const btnAudio = document.getElementById('btnAudioToggle');
+        btnAudio.addEventListener('click', () => {
+          appState.isMuted = !appState.isMuted;
+          btnAudio.classList.toggle('muted', appState.isMuted);
+          document.getElementById('audioIcon').textContent = appState.isMuted ? '🔇' : '🔊';
+          document.getElementById('audioLabel').textContent = appState.isMuted ? 'Bisu' : 'Suara';
+          if (!appState.isMuted) SoundEngine.playBell();
+        });
+
+        // Navigasi Bawah & Halaman 1
+        document.getElementById('btnStartAdventure').addEventListener('click', () => {
+          SoundEngine.playBell();
+          navigateToPage(2);
+        });
+
+        document.getElementById('btnNavHome').addEventListener('click', () => navigateToPage(1));
+        document.getElementById('btnNavPrev').addEventListener('click', () => navigateToPage(appState.currentPage - 1));
+        document.getElementById('btnNavNext').addEventListener('click', () => {
+          if (appState.currentPage === 6) {
+            openCelebrationModal();
+          } else {
+            navigateToPage(appState.currentPage + 1);
+          }
+        });
+
+        document.querySelectorAll('.tab-btn').forEach((tab) => {
+          tab.addEventListener('click', () => {
+            const target = Number(tab.getAttribute('data-page'));
+            navigateToPage(target);
+          });
+        });
+
+        // Navigasi Remote TV / Keyboard Panah Kiri & Kanan
+        window.addEventListener('keydown', (e) => {
+          if (document.getElementById('celebrationOverlay').classList.contains('active')) {
+            if (e.key === 'Escape') {
+              document.getElementById('celebrationOverlay').classList.remove('active');
+            }
+            return;
+          }
+          if (e.key === 'PageDown') {
+            navigateToPage(appState.currentPage + 1);
+          } else if (e.key === 'PageUp') {
+            navigateToPage(appState.currentPage - 1);
+          }
+        });
+
+        // Halaman 2: Kartu Satuan & Sorotan hg = ons
+        document.querySelectorAll('.unit-card-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            appState.selectedUnit = btn.getAttribute('data-unit');
+            renderUnitDetail();
+            SoundEngine.playBell();
+          });
+        });
+
+        document.getElementById('btnHighlightHgOns').addEventListener('click', () => {
+          appState.selectedUnit = 'hg';
+          renderUnitDetail();
+          const hlCard = document.getElementById('hgOnsHighlightCard');
+          hlCard.classList.add('highlighted');
+          SoundEngine.playCorrect();
+          setTimeout(() => hlCard.classList.remove('highlighted'), 1800);
+        });
+
+        // Halaman 3: Tangga Satuan
+        document.querySelectorAll('.step-row').forEach((row) => {
+          row.addEventListener('click', () => {
+            const newStep = Number(row.getAttribute('data-step'));
+            const diff = newStep - appState.ladderStep;
+            appState.ladderStep = newStep;
+            const unitName = UNIT_LABELS[UNITS_LIST[newStep]];
+            let msg = `🐱 <strong>Si Kucing Hitam berdiri di tangga ${unitName}.</strong>`;
+            if (diff > 0) {
+              const factor = Math.pow(10, diff);
+              msg = `⬇️ <strong>Turun ${diff} tingkat menuju ${unitName}!</strong> Operasi matematikanya adalah <strong>× ${formatNumberID(factor)}</strong>.`;
+            } else if (diff < 0) {
+              const factor = Math.pow(10, Math.abs(diff));
+              msg = `⬆️ <strong>Naik ${Math.abs(diff)} tingkat menuju ${unitName}!</strong> Operasi matematikanya adalah <strong>÷ ${formatNumberID(factor)}</strong>.`;
+            }
+            updateLadderUI(msg);
+            SoundEngine.playBell();
+          });
+        });
+
+        document.getElementById('btnLadderDown').addEventListener('click', () => {
+          if (appState.ladderStep < 3) {
+            appState.ladderStep += 1;
+            const unitName = UNIT_LABELS[UNITS_LIST[appState.ladderStep]];
+            const arrowDown = document.getElementById('badgeArrowDown');
+            arrowDown.classList.add('pulse-arrow');
+            setTimeout(() => arrowDown.classList.remove('pulse-arrow'), 600);
+            updateLadderUI(`⬇️ <strong>Turun 1 tingkat ke ${unitName}!</strong> Nilai dikali 10 (<strong>× 10</strong>).`);
+            SoundEngine.playBell();
+          }
+        });
+
+        document.getElementById('btnLadderUp').addEventListener('click', () => {
+          if (appState.ladderStep > 0) {
+            appState.ladderStep -= 1;
+            const unitName = UNIT_LABELS[UNITS_LIST[appState.ladderStep]];
+            const arrowUp = document.getElementById('badgeArrowUp');
+            arrowUp.classList.add('pulse-arrow');
+            setTimeout(() => arrowUp.classList.remove('pulse-arrow'), 600);
+            updateLadderUI(`⬆️ <strong>Naik 1 tingkat ke ${unitName}!</strong> Nilai dibagi 10 (<strong>÷ 10</strong>).`);
+            SoundEngine.playBell();
+          }
+        });
+
+        document.getElementById('btnSortDesc').addEventListener('click', () => animateLadderSequence('desc'));
+        document.getElementById('btnSortAsc').addEventListener('click', () => animateLadderSequence('asc'));
+
+        // Halaman 4: Simulasi Lift Angka Nol
+        document.querySelectorAll('[data-base]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const val = Number(btn.getAttribute('data-base'));
+            const unitKey = UNITS_LIST[appState.simStartFloor];
+            resetLift(val, unitKey);
+          });
+        });
+
+        document.querySelectorAll('[data-startunit]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const unitKey = btn.getAttribute('data-startunit');
+            const safeBase = appState.simStartValue > 5 ? 1 : appState.simStartValue;
+            resetLift(safeBase, unitKey);
+          });
+        });
+
+        document.querySelectorAll('[data-preset]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const key = btn.getAttribute('data-preset');
+            if (key === '1kg_g') resetLift(1, 'kg');
+            if (key === '1000g_kg') resetLift(1000, 'g');
+            if (key === '2kg_hg') resetLift(2, 'kg');
+            if (key === '5hg_dag') resetLift(5, 'hg');
+            if (key === '3dag_g') resetLift(3, 'dag');
+            SoundEngine.playBell();
+          });
+        });
+
+        document.getElementById('btnLiftDown').addEventListener('click', stepLiftDown);
+        document.getElementById('btnLiftUp').addEventListener('click', stepLiftUp);
+        document.getElementById('btnLiftReset').addEventListener('click', () => {
+          const safeBase = appState.simStartValue > 5 ? 1 : appState.simStartValue;
+          resetLift(safeBase, UNITS_LIST[appState.simStartFloor]);
+        });
+
+        // Halaman 5: Latihan Interaktif
+        document.getElementById('exerciseTabsList').addEventListener('click', (e) => {
+          const tab = e.target.closest('.ex-tab');
+          if (!tab) return;
+          appState.activeExerciseIdx = Number(tab.getAttribute('data-exidx'));
+          renderExercisePage();
+        });
+
+        document.getElementById('exOptionsGrid').addEventListener('click', (e) => {
+          const btn = e.target.closest('.option-btn');
+          if (!btn || btn.disabled) return;
+          const idx = appState.activeExerciseIdx;
+          const optIdx = Number(btn.getAttribute('data-optidx'));
+          const ex = EXERCISES_DATA[idx];
+
+          appState.exerciseSelectedOption[idx] = optIdx;
+          if (optIdx === ex.correctIndex) {
+            appState.exerciseSolved[idx] = true;
+            appState.exerciseExpOpen[idx] = true;
+            SoundEngine.playCorrect();
+          } else {
+            SoundEngine.playRetry();
+          }
+          renderExercisePage();
+        });
+
+        document.getElementById('btnExRetry').addEventListener('click', () => {
+          const idx = appState.activeExerciseIdx;
+          appState.exerciseSelectedOption[idx] = null;
+          renderExercisePage();
+        });
+
+        document.getElementById('btnExShowExp').addEventListener('click', () => {
+          const idx = appState.activeExerciseIdx;
+          appState.exerciseExpOpen[idx] = !appState.exerciseExpOpen[idx];
+          renderExercisePage();
+        });
+
+        document.getElementById('btnExNextQuestion').addEventListener('click', () => {
+          if (appState.activeExerciseIdx < EXERCISES_DATA.length - 1) {
+            appState.activeExerciseIdx += 1;
+            renderExercisePage();
+            SoundEngine.playBell();
+          } else {
+            navigateToPage(6);
+          }
+        });
+
+        // Halaman 6: Tantangan Akhir & Perayaan
+        document.getElementById('btnRevealChallenge').addEventListener('click', () => {
+          const idx = appState.activeChallengeIdx;
+          appState.challengeRevealed[idx] = true;
+          SoundEngine.playCorrect();
+          renderChallengePage();
+        });
+
+        document.getElementById('btnPrevChallenge').addEventListener('click', () => {
+          if (appState.activeChallengeIdx > 0) {
+            appState.activeChallengeIdx -= 1;
+            renderChallengePage();
+          }
+        });
+
+        document.getElementById('btnNextChallenge').addEventListener('click', () => {
+          if (appState.activeChallengeIdx < CHALLENGES_DATA.length - 1) {
+            appState.activeChallengeIdx += 1;
+            renderChallengePage();
+          }
+        });
+
+        document.getElementById('btnFinishCelebration').addEventListener('click', openCelebrationModal);
+        document.getElementById('btnCloseCelebration').addEventListener('click', () => {
+          document.getElementById('celebrationOverlay').classList.remove('active');
+        });
+
+        // Render awal
+        renderUnitDetail();
+        updateLadderUI();
+        updateSimulatorUI();
+        renderExercisePage();
+        renderChallengePage();
+      }
+
+      window.addEventListener('DOMContentLoaded', initApp);
+    })();
+  </script>
+</body>
+</html>
